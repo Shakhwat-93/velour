@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Search, SlidersHorizontal, X, ShoppingBag,
-  Sparkles, Star, ChevronDown, ArrowRight, Heart,
+  Sparkles, Star, ChevronDown, Heart,
   Filter
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import { Plus, Trash2, Edit, X, Check, FolderOpen, Image, Type, AlignLeft, Hash, Globe, Upload, Loader2 } from 'lucide-react'
+import { Plus, Trash2, Edit, X, Check, FolderOpen, Image, Type, AlignLeft, Globe, Upload, Loader2 } from 'lucide-react'
 import { slugify } from '@/lib/utils/slugify'
 import { motion, AnimatePresence } from 'framer-motion'
 

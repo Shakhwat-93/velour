@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { formatPrice } from '@/lib/utils/formatPrice'
-import { Search, ChevronDown, Eye, X, Package, MapPin, ShoppingBag, Calendar, User, CreditCard, ExternalLink, Box, Activity, RefreshCw } from 'lucide-react'
+import { Search, ChevronDown, Eye, X, Package, MapPin, ShoppingBag, Calendar, User, CreditCard, Box, Activity, RefreshCw } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const STATUS_OPTIONS = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']

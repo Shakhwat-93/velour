@@ -1,9 +1,9 @@
-import { Link, useLocation, Outlet, NavLink } from 'react-router-dom'
+import { Link, useLocation, Outlet } from 'react-router-dom'
 import { useAuth } from '@/context/useAuth'
 import {
   LayoutDashboard, ShoppingBag, Package, Settings, LogOut,
   ExternalLink, Menu, ShieldCheck, ChevronDown,
-  Plus, List, Tags, Sliders, Bell, Globe, X, Activity, Zap
+  Plus, List, Tags, Bell, Globe, X, Activity, Zap
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { useState, useEffect } from 'react'

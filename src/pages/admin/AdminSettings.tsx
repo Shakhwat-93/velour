@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
-import { Settings, Megaphone, Link as LinkIcon, Save } from 'lucide-react'
+import { Megaphone, Link as LinkIcon, Save } from 'lucide-react'
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<{ [key: string]: string }>({})

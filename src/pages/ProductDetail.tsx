@@ -1,10 +1,10 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { 
   ChevronRight, Minus, Plus, ShoppingBag, 
-  Heart, Star, ShieldCheck, Truck, RotateCcw, 
-  Sparkles, Info, Droplets, Wind, Mountain
+  Heart, Star, ShieldCheck, Truck, 
+  Sparkles, Droplets, Wind, Mountain
 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import { useCart } from '@/context/CartContext'

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '@/lib/supabase/client'
 import { formatPrice } from '@/lib/utils/formatPrice'
-import { Plus, Edit, Trash2, Package, Search, Filter, MoreHorizontal } from 'lucide-react'
+import { Plus, Edit, Trash2, Package, Search, Filter } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export default function AdminProducts() {
