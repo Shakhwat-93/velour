@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase/client'
 import { formatPrice } from '@/lib/utils/formatPrice'
 import {
   Package, ShoppingBag, DollarSign, Users,
-  TrendingUp, ArrowUpRight, Plus, Clock, Shield
+  TrendingUp, ArrowUpRight, Plus, Clock, Shield, Settings
 } from 'lucide-react'
 
 const STATUS: Record<string, { label: string; color: string; bg: string }> = {
