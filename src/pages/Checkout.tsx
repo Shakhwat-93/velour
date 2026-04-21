@@ -59,7 +59,8 @@ export default function Checkout() {
         product_id: item.product.id,
         name: item.product.name,
         qty: item.qty,
-        price: item.product.price,
+        price: item.selectedPrice ?? item.product.price,
+        size: item.selectedSize,
         image: item.product.images?.[0],
         product: item.product,
       }))
@@ -241,7 +242,7 @@ export default function Checkout() {
               <div className="space-y-4">
                 {state.items.map((item) => (
                   <motion.div
-                    key={item.product.id}
+                    key={`${item.product.id}-${item.selectedSize}`}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     className="flex items-center gap-4 rounded-[1.3rem] border border-border-light bg-bg-primary/75 p-3"
@@ -256,10 +257,11 @@ export default function Checkout() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-text-primary">{item.product.name}</p>
-                      <p className="mt-1 text-xs text-text-muted">{formatPrice(item.product.price)}</p>
+                      <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-brand-gold/70">{item.selectedSize || 'Standard'}</p>
+                      <p className="mt-1 text-xs text-text-muted">{formatPrice(item.selectedPrice ?? item.product.price)}</p>
                     </div>
                     <p className="text-sm font-semibold text-text-primary">
-                      {formatPrice(item.product.price * item.qty)}
+                      {formatPrice((item.selectedPrice ?? item.product.price) * item.qty)}
                     </p>
                   </motion.div>
                 ))}

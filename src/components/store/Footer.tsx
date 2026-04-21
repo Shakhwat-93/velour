@@ -1,5 +1,5 @@
+import { ArrowUpRight, Mail, Sparkles, Phone, MapPin } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { ArrowUpRight, Mail, Sparkles } from 'lucide-react'
 
 const EXPLORE_LINKS = [
   { label: 'Shop All', to: '/shop' },
@@ -37,7 +37,7 @@ export default function Footer() {
               letterSpacing: '-0.02em',
             }}
           >
-            Your scent. Your signature.
+            Velour isn't just a scent, it's an experience
           </p>
         </div>
       </div>
@@ -58,12 +58,58 @@ export default function Footer() {
             </Link>
 
             <p className="text-[13px] leading-[1.8] max-w-sm mb-10" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              A refined fragrance house shaped around extrait de parfum. We craft memorable presence and a luxury experience that feels calm on every screen.
+              Velour is more than a fragrance—it's a curated journey of modern opulence and artisan-crafted blends, designed for those who expect the finest.
             </p>
+            
+            <div className="space-y-4 mb-10">
+              <div className="flex items-center gap-3 text-[13px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                <Phone size={16} strokeWidth={1.5} className="text-[#c9a472]" />
+                <span>01865-091230</span>
+              </div>
+              <div className="flex items-center gap-3 text-[13px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                <Mail size={16} strokeWidth={1.5} className="text-[#c9a472]" />
+                <a href="mailto:velour486@gmail.com" className="hover:text-white transition-colors">velour486@gmail.com</a>
+              </div>
+              <div className="flex items-center gap-3 text-[13px]" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                <MapPin size={16} strokeWidth={1.5} className="text-[#c9a472]" />
+                <span>Dhaka, Narayanganj, Bangladesh, 1306</span>
+              </div>
+            </div>
 
             <div className="flex items-center gap-4">
-              <a href="mailto:hello@velour.com" className="w-12 h-12 rounded-full border flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:text-[#181511]" style={{ borderColor: 'rgba(255,255,255,0.15)', color: '#fff' }}>
-                <Mail size={18} strokeWidth={1.5} />
+              <a 
+                href="https://www.facebook.com/velour.byofficial?mibextid=wwXIfr" 
+                target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-xl border flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:text-[#181511]" 
+                style={{ borderColor: 'rgba(255,255,255,0.15)', color: '#fff' }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                </svg>
+              </a>
+              <a 
+                href="https://www.instagram.com/velour.byofficial" 
+                target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-xl border flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:text-[#181511]" 
+                style={{ borderColor: 'rgba(255,255,255,0.15)', color: '#fff' }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </a>
+              <a 
+                href="https://www.tiktok.com/@velour.byofficial" 
+                target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-xl border flex items-center justify-center transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:text-[#181511]" 
+                style={{ borderColor: 'rgba(255,255,255,0.15)', color: '#fff' }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18V5l12-2v13"></path>
+                  <circle cx="6" cy="18" r="3"></circle>
+                  <circle cx="18" cy="16" r="3"></circle>
+                </svg>
               </a>
             </div>
           </div>

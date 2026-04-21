@@ -61,9 +61,9 @@ export default function CartDrawer() {
             </div>
           ) : (
             <div className="space-y-4">
-              {state.items.map(({ product, qty }) => (
+              {state.items.map(({ product, qty, selectedSize, selectedPrice }) => (
                 <div
-                  key={product.id}
+                  key={`${product.id}-${selectedSize}`}
                   className="rounded-[1.4rem] border border-border-subtle bg-bg-primary/65 p-4"
                 >
                   <div className="flex gap-4">
@@ -78,11 +78,11 @@ export default function CartDrawer() {
                         <div>
                           <p className="truncate text-sm font-semibold text-text-primary">{product.name}</p>
                           <p className="mt-1 text-[0.66rem] uppercase tracking-[0.2em] text-brand-gold/70">
-                            Extrait de Parfum
+                            {selectedSize || 'Extrait de Parfum'}
                           </p>
                         </div>
                         <button
-                          onClick={() => removeItem(product.id)}
+                          onClick={() => removeItem(product.id, selectedSize)}
                           className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-red-50 hover:text-red-500"
                           aria-label={`Remove ${product.name}`}
                         >
@@ -93,14 +93,14 @@ export default function CartDrawer() {
                       <div className="mt-4 flex items-center justify-between gap-3">
                         <div className="flex items-center gap-2 rounded-full border border-border-light bg-surface px-2 py-1.5">
                           <button
-                            onClick={() => updateQty(product.id, qty - 1)}
+                            onClick={() => updateQty(product.id, qty - 1, selectedSize)}
                             className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-bg-secondary hover:text-text-primary"
                           >
                             <Minus size={14} />
                           </button>
                           <span className="min-w-6 text-center text-sm font-semibold text-text-primary">{qty}</span>
                           <button
-                            onClick={() => updateQty(product.id, qty + 1)}
+                            onClick={() => updateQty(product.id, qty + 1, selectedSize)}
                             className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-bg-secondary hover:text-text-primary"
                           >
                             <Plus size={14} />
@@ -108,7 +108,7 @@ export default function CartDrawer() {
                         </div>
 
                         <p className="text-sm font-semibold text-text-primary">
-                          {formatPrice(product.price * qty)}
+                          {formatPrice((selectedPrice ?? product.price) * qty)}
                         </p>
                       </div>
                     </div>

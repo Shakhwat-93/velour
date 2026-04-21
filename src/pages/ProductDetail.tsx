@@ -91,6 +91,7 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
   const [isWished, setIsWished] = useState(false)
+  const [selectedVariant, setSelectedVariant] = useState<any>(null)
 
   useEffect(() => {
     async function fetchProduct() {
@@ -108,7 +109,12 @@ export default function ProductDetail() {
         return
       }
 
-      setProduct(data as Product)
+      if (data) {
+        setProduct(data as Product)
+        if (data.variants && data.variants.length > 0) {
+          setSelectedVariant(data.variants[0])
+        }
+      }
       setActiveImage(0)
       setQty(1)
 
@@ -130,8 +136,13 @@ export default function ProductDetail() {
 
   const handleAdd = () => {
     if (!product) return
-    addItem(product, qty)
-    toast(`${product.name} added to bag`)
+    addItem(
+      product, 
+      qty, 
+      selectedVariant?.size, 
+      selectedVariant ? selectedVariant.price : product.price
+    )
+    toast(`${product.name}${selectedVariant ? ` (${selectedVariant.size})` : ''} added to bag`)
   }
 
   if (loading) {
@@ -269,11 +280,37 @@ export default function ProductDetail() {
             </h1>
 
             <div className="flex items-baseline gap-4 mb-8">
-              <span className="text-[28px] font-bold text-[#181511]">{formatPrice(product.price)}</span>
-              {hasDiscount && (
-                <span className="text-[18px] line-through text-[#a09890]">{formatPrice(product.compare_at_price!)}</span>
-              )}
+              <span className="text-[28px] font-bold text-[#181511]">
+                {formatPrice(selectedVariant ? selectedVariant.price : product.price)}
+              </span>
+              {(selectedVariant?.compare_at_price || product.compare_at_price) ? (
+                <span className="text-[18px] line-through text-[#a09890]">
+                  {formatPrice(selectedVariant?.compare_at_price || product.compare_at_price || 0)}
+                </span>
+              ) : null}
             </div>
+
+            {/* Size Selection */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="mb-10">
+                <p className="text-[10px] font-black tracking-[0.2em] uppercase mb-4" style={{ color: '#71675d' }}>Select Size</p>
+                <div className="flex flex-wrap gap-3">
+                  {product.variants.map((variant, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedVariant(variant)}
+                      className={`h-12 px-6 rounded-xl text-[12px] font-bold transition-all duration-300 border ${
+                        selectedVariant?.size === variant.size 
+                          ? 'bg-[#181511] text-white border-[#181511] shadow-lg scale-105' 
+                          : 'bg-white text-[#71675d] border-rgba(24,21,17,0.1) hover:border-[#c9a472]'
+                      }`}
+                    >
+                      {variant.size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <p className="text-[15px] leading-[1.8] text-[#5a5048] mb-10 max-w-lg">
               {product.description || 'A masterpiece of olfactory precision, crafted for those who define elegance through subtlety. This extrait de parfum evolves gracefully throughout the day, leaving a trail of quiet confidence.'}
@@ -323,7 +360,7 @@ export default function ProductDetail() {
                 }}
               >
                 <ShoppingBag size={18} strokeWidth={2} />
-                Add to Bag — {formatPrice(product.price * qty)}
+                Add to Bag — {formatPrice((selectedVariant ? selectedVariant.price : product.price) * qty)}
               </button>
             </div>
 

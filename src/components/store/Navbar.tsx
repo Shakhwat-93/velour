@@ -69,7 +69,7 @@ export default function Navbar() {
   return (
     <>
       <div className="bg-[linear-gradient(90deg,#8f6a39_0%,#b7884e_45%,#8f6a39_100%)] px-4 py-2.5 text-center text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-white/92 shadow-[inset_0_-1px_0_rgba(255,255,255,0.08)]">
-        Complimentary shipping on orders over {formatPrice(2500)}{' '}
+        FREE DELIVERY All Over Bangladesh📦{' '}
         <Link to="/shop" className="text-white underline underline-offset-4 transition-colors hover:text-[#fff4dc]">
           Explore the collection
         </Link>

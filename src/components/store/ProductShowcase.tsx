@@ -27,17 +27,27 @@ export function ShowcaseCard({ product, index }: { product: Product; index: numb
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation()
-    addItem(product)
-    toast(`${product.name} added to bag`)
+    const defaultVariant = product.variants && product.variants.length > 0 ? product.variants[0] : null
+    addItem(
+      product, 
+      1, 
+      defaultVariant?.size, 
+      defaultVariant ? defaultVariant.price : product.price
+    )
+    toast(`${product.name}${defaultVariant ? ` (${defaultVariant.size})` : ''} added to bag`)
   }
   const handleWish = (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation()
     setWished(w => !w)
   }
 
-  const hasDiscount = !!product.compare_at_price && product.compare_at_price > product.price
+  const hasVariants = !!(product.variants && product.variants.length > 0)
+  const minPrice = hasVariants 
+    ? Math.min(...product.variants!.map(v => v.price)) 
+    : product.price
+  const hasDiscount = !!product.compare_at_price && product.compare_at_price > minPrice
   const pct = hasDiscount
-    ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100)
+    ? Math.round(((product.compare_at_price! - minPrice) / product.compare_at_price!) * 100)
     : 0
 
   return (
@@ -167,9 +177,11 @@ export function ShowcaseCard({ product, index }: { product: Product; index: numb
             style={{ borderTop: '1px solid rgba(24,21,17,0.07)' }}
           >
             <div>
-              <p className="text-[9px] font-bold tracking-widest uppercase" style={{ color: '#a09890' }}>Price</p>
+              <p className="text-[9px] font-bold tracking-widest uppercase" style={{ color: '#a09890' }}>
+                {hasVariants ? 'From' : 'Price'}
+              </p>
               <div className="flex items-baseline gap-1.5 mt-0.5">
-                <span className="text-[15px] font-bold" style={{ color: '#181511' }}>{formatPrice(product.price)}</span>
+                <span className="text-[15px] font-bold" style={{ color: '#181511' }}>{formatPrice(minPrice)}</span>
                 {hasDiscount && (
                   <span className="text-[11px] line-through" style={{ color: '#c4b8ad' }}>
                     {formatPrice(product.compare_at_price!)}

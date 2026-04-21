@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 const INITIAL_FORM = {
   name: '', description: '', price: 0, compare_at_price: 0,
   category_id: '', stock_qty: 0, featured: false, in_stock: true, images: [] as string[],
+  variants: [] as any[],
 }
 
 export default function AdminProductForm() {
@@ -29,7 +30,7 @@ export default function AdminProductForm() {
       
       if (isEditing) {
         const { data } = await (supabase as any).from('products').select('*').eq('id', id).single()
-        if (data) setForm({ ...(data as any), compare_at_price: (data as any).compare_at_price || 0, images: (data as any).images || [] })
+        if (data) setForm({ ...(data as any), compare_at_price: (data as any).compare_at_price || 0, images: (data as any).images || [], variants: (data as any).variants || [] })
       }
       setFetching(false)
     }
@@ -166,12 +167,93 @@ export default function AdminProductForm() {
                   value={form.description}
                   onChange={e => setForm({ ...form, description: e.target.value })}
                   placeholder="Enter product description..."
-                  className="w-full p-6 rounded-[20px] text-[14px] outline-none transition-all duration-300 min-h-[200px] resize-none leading-relaxed"
+                  className="w-full p-6 rounded-[20px] text-[14px] outline-none transition-all duration-300 min-h-[150px] resize-none leading-relaxed"
                   style={inputStyle}
                   onFocus={(e) => { e.target.style.borderColor = 'rgba(201,164,114,0.4)'; e.target.style.boxShadow = '0 4px 16px rgba(201,164,114,0.08)' }}
                   onBlur={(e) => { e.target.style.borderColor = 'rgba(24,21,17,0.1)'; e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)' }}
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Variants Section */}
+          <div className="rounded-[24px] overflow-hidden" style={cardStyle}>
+            <div className="px-10 py-8 border-b flex justify-between items-center" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+              <div className="flex items-center gap-3">
+                <Layers size={18} style={{ color: '#c9a472' }} />
+                <h2 className="text-[14px] font-bold tracking-widest uppercase" style={{ color: '#181511' }}>Product Variants (Sizes)</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setForm({ ...form, variants: [...form.variants, { size: '', price: 0, stock_qty: 0 }] })}
+                className="h-10 px-6 rounded-xl text-[10px] font-black tracking-widest uppercase flex items-center gap-2 transition-all active:scale-95"
+                style={{ background: '#181511', color: '#fff' }}
+              >
+                <Plus size={14} /> Add Variant
+              </button>
+            </div>
+            <div className="p-10 space-y-6">
+              {form.variants.length > 0 ? (
+                <div className="space-y-4">
+                  {form.variants.map((variant, index) => (
+                    <div key={index} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_48px] gap-4 items-end p-6 rounded-2xl border" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#a09a90' }}>Size (e.g. 15ml)</label>
+                        <input
+                          type="text"
+                          value={variant.size}
+                          onChange={e => {
+                            const v = [...form.variants]; v[index].size = e.target.value
+                            setForm({ ...form, variants: v })
+                          }}
+                          className="w-full h-12 px-4 rounded-xl text-[13px] font-bold outline-none"
+                          style={inputStyle}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#a09a90' }}>Price (BDT)</label>
+                        <input
+                          type="number"
+                          value={variant.price}
+                          onChange={e => {
+                            const v = [...form.variants]; v[index].price = parseFloat(e.target.value) || 0
+                            setForm({ ...form, variants: v })
+                          }}
+                          className="w-full h-12 px-4 rounded-xl text-[13px] font-bold outline-none"
+                          style={inputStyle}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#a09a90' }}>Stock</label>
+                        <input
+                          type="number"
+                          value={variant.stock_qty}
+                          onChange={e => {
+                            const v = [...form.variants]; v[index].stock_qty = parseInt(e.target.value) || 0
+                            setForm({ ...form, variants: v })
+                          }}
+                          className="w-full h-12 px-4 rounded-xl text-[13px] font-bold outline-none"
+                          style={inputStyle}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const v = [...form.variants]; v.splice(index, 1)
+                          setForm({ ...form, variants: v })
+                        }}
+                        className="w-12 h-12 rounded-xl flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="py-12 text-center border-2 border-dashed rounded-3xl" style={{ borderColor: 'rgba(24,21,17,0.06)' }}>
+                  <p className="text-[13px] font-medium" style={{ color: '#a09a90' }}>No variants added. Use variants for multiple sizes.</p>
+                </div>
+              )}
             </div>
           </div>
 

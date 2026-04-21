@@ -32,8 +32,8 @@ export default function About() {
     <div className="page-enter bg-bg-primary">
       <PageHero
         eyebrow="Our story"
-        title="Crafted for those who expect the finest."
-        description="Velour was built around the belief that luxury should feel composed, memorable, and intentionally designed across product, brand, and digital experience."
+        title="Velour isn't just a scent, it's an experience"
+        description="Velour was built around the belief that luxury should feel composed, memorable, and intentionally designed. We craft premium fragrances that linger with confidence and depth."
       />
 
       <section className="section-padding">
@@ -57,8 +57,8 @@ export default function About() {
               <h2 className="text-heading-lg text-balance">A fragrance is memory, atmosphere, and identity in one gesture.</h2>
               <div className="mt-6 space-y-5 text-sm leading-7 text-text-muted md:text-base md:leading-8">
                 <p>
-                  Velour began with a simple conviction: premium fragrance should feel elegant before the first spray.
-                  That meant investing in stronger compositions, clearer storytelling, and a digital experience that
+                  Velour is more than a fragrance—it's a curated journey of modern opulence and artisan-crafted blends. 
+                  We believe that premium fragrance should feel elegant from the very first encounter.
                   communicates calm confidence rather than excess.
                 </p>
                 <p>

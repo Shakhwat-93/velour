@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Navbar from '@/components/store/Navbar'
 import Footer from '@/components/store/Footer'
 import CartDrawer from '@/components/store/CartDrawer'
+import PromoPopup from '@/components/store/PromoPopup'
 
 const pageVariants = {
   initial: { opacity: 0, y: 18 },
@@ -37,6 +38,7 @@ export default function StoreLayout() {
       </main>
       <Footer />
       <CartDrawer />
+      <PromoPopup />
     </div>
   )
 }

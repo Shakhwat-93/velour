@@ -3,7 +3,6 @@ import { motion } from 'framer-motion'
 import { ArrowRight, Flame, Sparkles, Wind, Droplets, Gift } from 'lucide-react'
 import HeroSection from '@/components/store/HeroSection'
 import ProductShowcase from '@/components/store/ProductShowcase'
-import PromoPopup from '@/components/store/PromoPopup'
 
 const FAMILIES = [
   { name: 'Woody', icon: Flame, description: 'Warm, grounding, and quietly magnetic.' },
@@ -24,7 +23,6 @@ const MARQUEE_WORDS = [
 export default function Home() {
   return (
     <div className="page-enter bg-bg-primary">
-      <PromoPopup />
       <HeroSection />
       <Marquee />
 

@@ -19,6 +19,13 @@ export interface Category {
   created_at: string
 }
 
+export interface ProductVariant {
+  size: string
+  price: number
+  compare_at_price?: number
+  stock_qty: number
+}
+
 export interface Product {
   id: string
   name: string
@@ -31,6 +38,7 @@ export interface Product {
   in_stock: boolean
   stock_qty: number
   featured: boolean
+  variants?: ProductVariant[]
   created_at: string
   // joined
   category?: Category
@@ -41,6 +49,7 @@ export interface OrderItem {
   name: string
   qty: number
   price: number
+  size?: string
   image?: string
   product?: Product
 }
@@ -80,6 +89,8 @@ export interface SiteSetting {
 export interface CartItem {
   product: Product
   qty: number
+  selectedSize?: string
+  selectedPrice?: number
 }
 
 export interface CartState {

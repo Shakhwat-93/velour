@@ -54,8 +54,7 @@ export default function HeroSection() {
           </h1>
 
           <p className="mt-5 max-w-xl text-[0.98rem] leading-7 text-white/74 sm:text-[1.05rem] sm:leading-8">
-            Masterfully crafted fragrances designed to linger with confidence, depth, and a premium
-            presence that feels unmistakably Velour.
+            Velour isn't just a scent, it's an experience. Masterfully crafted fragrances designed to linger with confidence, depth, and a premium presence.
           </p>
 
           <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">

@@ -17,13 +17,23 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleQuickAdd = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault()
     event.stopPropagation()
-    addItem(product)
-    toast(`Added ${product.name} to bag`)
+    const defaultVariant = product.variants && product.variants.length > 0 ? product.variants[0] : null
+    addItem(
+      product, 
+      1, 
+      defaultVariant?.size, 
+      defaultVariant ? defaultVariant.price : product.price
+    )
+    toast(`Added ${product.name}${defaultVariant ? ` (${defaultVariant.size})` : ''} to bag`)
   }
 
   const primaryImage = product.images?.[0]
   const secondaryImage = product.images?.[1]
-  const hasDiscount = !!product.compare_at_price && product.compare_at_price > product.price
+  const hasVariants = !!(product.variants && product.variants.length > 0)
+  const minPrice = hasVariants 
+    ? Math.min(...product.variants!.map(v => v.price)) 
+    : product.price
+  const hasDiscount = !!product.compare_at_price && product.compare_at_price > minPrice
   const description = getExcerpt(product.description)
 
   return (
@@ -114,11 +124,11 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="mt-5 flex items-center justify-between gap-3 rounded-[1.25rem] border border-black/8 bg-white px-4 py-3">
             <div className="min-w-0">
               <p className="text-[0.66rem] font-semibold uppercase tracking-[0.18em] text-text-muted">
-                Price
+                {hasVariants ? 'From' : 'Price'}
               </p>
               <div className="mt-1 flex items-center gap-2">
                 <p className="text-[1rem] font-semibold text-text-primary sm:text-[1.08rem]">
-                  {formatPrice(product.price)}
+                  {formatPrice(minPrice)}
                 </p>
                 {hasDiscount && (
                   <p className="text-[0.7rem] text-text-muted/70 line-through">

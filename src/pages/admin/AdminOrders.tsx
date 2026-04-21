@@ -18,21 +18,24 @@ function StatusDropdown({
   status, 
   orderId, 
   onUpdate, 
-  updating 
+  updating,
+  isOpen,
+  onToggle
 }: { 
   status: string; 
   orderId: string; 
   onUpdate: (id: string, s: string) => void; 
-  updating: boolean 
+  updating: boolean;
+  isOpen: boolean;
+  onToggle: (open: boolean) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false)
 
   return (
     <div className="relative inline-block">
       <motion.button
         whileTap={{ scale: 0.98 }}
         disabled={updating}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => onToggle(!isOpen)}
         className={`flex items-center gap-3 px-5 h-10 rounded-full text-[10px] font-black tracking-[0.1em] uppercase transition-all border shadow-sm ${statusStyle[status] || statusStyle.pending} ${updating ? 'opacity-50 cursor-wait' : 'opacity-100 hover:shadow-md'}`}
       >
         {status}
@@ -42,7 +45,7 @@ function StatusDropdown({
       <AnimatePresence>
         {isOpen && (
           <>
-            <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+            <div className="fixed inset-0 z-10" onClick={() => onToggle(false)} />
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -56,7 +59,7 @@ function StatusDropdown({
                     key={s}
                     onClick={() => {
                       onUpdate(orderId, s)
-                      setIsOpen(false)
+                      onToggle(false)
                     }}
                     className={`w-full text-left px-4 py-3 rounded-xl text-[10px] font-black tracking-widest uppercase transition-all flex items-center justify-between group ${status === s ? 'bg-white/10' : 'hover:bg-white/5'}`}
                     style={{ color: status === s ? '#fff' : 'rgba(255,255,255,0.6)' }}
@@ -84,6 +87,7 @@ export default function AdminOrders() {
   // Modal State
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null)
   const [fetchingRatio, setFetchingRatio] = useState<string | null>(null)
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null)
 
   const handleCheckRatio = async (phone: string, orderId: string) => {
     if (!phone || fetchingRatio === orderId) return
@@ -260,8 +264,11 @@ export default function AdminOrders() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: idx * 0.03 }}
-                      className="group transition-colors duration-300 relative z-[1]"
-                      style={{ background: '#fff' }}
+                      className="group transition-colors duration-300 relative"
+                      style={{ 
+                        background: '#fff', 
+                        zIndex: openDropdownId === order.id ? 50 : 1 
+                      }}
                       onMouseEnter={(e) => (e.currentTarget.style.background = '#faf9f7')}
                       onMouseLeave={(e) => (e.currentTarget.style.background = '#fff')}
                     >
@@ -293,7 +300,9 @@ export default function AdminOrders() {
                           status={order.status || 'pending'} 
                           orderId={order.id} 
                           onUpdate={updateStatus} 
-                          updating={updating === order.id} 
+                          updating={updating === order.id}
+                          isOpen={openDropdownId === order.id}
+                          onToggle={(open) => setOpenDropdownId(open ? order.id : null)} 
                         />
                       </td>
                       <td className="px-8 py-6">
@@ -385,7 +394,9 @@ export default function AdminOrders() {
                         status={selectedOrder.status} 
                         orderId={selectedOrder.id} 
                         onUpdate={updateStatus} 
-                        updating={updating === selectedOrder.id} 
+                        updating={updating === selectedOrder.id}
+                        isOpen={openDropdownId === selectedOrder.id}
+                        onToggle={(open) => setOpenDropdownId(open ? selectedOrder.id : null)} 
                       />
                     </div>
                   </div>
@@ -529,6 +540,11 @@ export default function AdminOrders() {
                             <div className="flex items-center gap-3">
                               <span className="text-[12px] font-medium" style={{ color: '#71675d' }}>{formatPrice(unitPrice)}</span>
                               <span className="text-[10px] font-black tracking-widest" style={{ color: '#a09a90' }}>x {item.qty}</span>
+                              {item.size && (
+                                <span className="text-[9px] font-black tracking-[0.15em] uppercase px-2 py-0.5 rounded-md bg-amber-50 text-amber-600 border border-amber-100">
+                                  {item.size}
+                                </span>
+                              )}
                             </div>
                           </div>
                           <div className="text-right">
