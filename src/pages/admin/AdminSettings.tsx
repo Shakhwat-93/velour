@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
-import { Megaphone, Link as LinkIcon, Save, Sparkles, Image as ImageIcon, Type, FileText, Gift, Eye, Truck, KeyRound, ShieldCheck } from 'lucide-react'
+import { Megaphone, Link as LinkIcon, Save, Sparkles, Image as ImageIcon, Type, FileText, Gift, Eye, Truck, KeyRound, ShieldCheck, CheckCircle } from 'lucide-react'
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<{ [key: string]: string }>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [savedMessage, setSavedMessage] = useState('')
 
   const fetchSettings = async () => {
     const { data } = await (supabase as any).from('site_settings').select('*')
@@ -24,11 +25,14 @@ export default function AdminSettings() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
+    setSavedMessage('')
 
     const payload = Object.entries(settings).map(([key, value]) => ({ key, value }))
     await (supabase as any).from('site_settings').upsert(payload)
 
     setSaving(false)
+    setSavedMessage('Settings saved successfully.')
+    window.setTimeout(() => setSavedMessage(''), 3200)
   }
 
   if (loading) return (
@@ -51,6 +55,18 @@ export default function AdminSettings() {
         </p>
       </div>
 
+      {savedMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3 rounded-2xl border px-5 py-4"
+          style={{ background: '#ecfdf5', borderColor: '#a7f3d0', color: '#047857' }}
+        >
+          <CheckCircle size={18} strokeWidth={2.2} />
+          <p className="text-[13px] font-bold">{savedMessage}</p>
+        </motion.div>
+      )}
+
       {/* Courier Integration */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -70,6 +86,12 @@ export default function AdminSettings() {
 
         <form onSubmit={handleSave} className="p-5 sm:p-10 space-y-7 sm:space-y-8">
           <div className="space-y-6">
+            <div className="rounded-[20px] border p-4 sm:p-5 space-y-5" style={{ borderColor: 'rgba(79,70,229,0.14)', background: '#f8f7ff' }}>
+              <div>
+                <h3 className="text-[13px] font-black tracking-[0.16em] uppercase" style={{ color: '#181511' }}>Primary Steadfast Account</h3>
+                <p className="mt-1 text-[12px] font-medium" style={{ color: '#71675d' }}>This account is used every time you send an order.</p>
+              </div>
+
             <div className="space-y-3">
               <label className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#181511' }}>
                 <KeyRound size={14} style={{ color: '#4f46e5' }} /> API Key
@@ -98,6 +120,44 @@ export default function AdminSettings() {
                 style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
                 autoComplete="off"
               />
+            </div>
+            </div>
+
+            <div className="rounded-[20px] border p-4 sm:p-5 space-y-5" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+              <div>
+                <h3 className="text-[13px] font-black tracking-[0.16em] uppercase" style={{ color: '#181511' }}>Second Steadfast Account</h3>
+                <p className="mt-1 text-[12px] font-medium" style={{ color: '#71675d' }}>Optional. If both keys are saved, order will be sent here too.</p>
+              </div>
+
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#181511' }}>
+                  <KeyRound size={14} style={{ color: '#4f46e5' }} /> Second API Key
+                </label>
+                <input
+                  type="password"
+                  value={settings['steadfast_secondary_api_key'] || ''}
+                  onChange={e => setSettings({ ...settings, steadfast_secondary_api_key: e.target.value })}
+                  placeholder="Optional second Steadfast API key"
+                  className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                  style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
+                  autoComplete="off"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#181511' }}>
+                  <ShieldCheck size={14} style={{ color: '#4f46e5' }} /> Second Secret Key
+                </label>
+                <input
+                  type="password"
+                  value={settings['steadfast_secondary_secret_key'] || ''}
+                  onChange={e => setSettings({ ...settings, steadfast_secondary_secret_key: e.target.value })}
+                  placeholder="Optional second Steadfast secret key"
+                  className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                  style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
+                  autoComplete="off"
+                />
+              </div>
             </div>
           </div>
 

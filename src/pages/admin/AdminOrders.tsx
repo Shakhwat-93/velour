@@ -28,7 +28,8 @@ function getDeliveryDetails(order: any) {
   return { fee, label }
 }
 
-function getCourierSubmission(order: any) {
+function getCourierSubmission(order: any, account: 'primary' | 'secondary' = 'primary') {
+  if (account === 'secondary') return order.courier_data?.steadfast_secondary || null
   return order.courier_data?.steadfast || null
 }
 
@@ -63,6 +64,46 @@ function buildSteadfastPayload(order: any) {
     item_description: itemDescription.slice(0, 500),
     total_lot: items.reduce((sum: number, item: any) => sum + (Number(item.qty) || 1), 0) || 1,
     delivery_type: 0,
+  }
+}
+
+async function createSteadfastOrder({
+  apiKey,
+  secretKey,
+  payload,
+}: {
+  apiKey: string
+  secretKey: string
+  payload: ReturnType<typeof buildSteadfastPayload>
+}) {
+  const response = await fetch('/api/steadfast', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      endpoint: '/create_order',
+      apiKey,
+      secretKey,
+      payload,
+    }),
+  })
+  const data = await response.json()
+
+  if (!response.ok || (data.status && Number(data.status) >= 400)) {
+    throw new Error(data.message || data.error || 'Steadfast rejected this order.')
+  }
+
+  return data
+}
+
+function normalizeSteadfastSubmission(payload: ReturnType<typeof buildSteadfastPayload>, data: any) {
+  return {
+    submitted_at: new Date().toISOString(),
+    request: payload,
+    response: data,
+    consignment: data.consignment || null,
+    consignment_id: data.consignment?.consignment_id || null,
+    tracking_code: data.consignment?.tracking_code || null,
+    status: data.consignment?.status || data.delivery_status || 'created',
   }
 }
 
@@ -245,33 +286,36 @@ export default function AdminOrders() {
     setSubmittingCourierId(order.id)
 
     try {
-      const response = await fetch('/api/steadfast', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          endpoint: '/create_order',
-          apiKey: settings.steadfast_api_key,
-          secretKey: settings.steadfast_secret_key,
-          payload,
-        }),
+      const primaryData = await createSteadfastOrder({
+        apiKey: settings.steadfast_api_key,
+        secretKey: settings.steadfast_secret_key,
+        payload,
       })
-      const data = await response.json()
+      const secondaryConfigured = Boolean(settings.steadfast_secondary_api_key && settings.steadfast_secondary_secret_key)
+      let secondaryData = null
 
-      if (!response.ok || (data.status && Number(data.status) >= 400)) {
-        throw new Error(data.message || data.error || 'Steadfast rejected this order.')
+      if (secondaryConfigured) {
+        secondaryData = await createSteadfastOrder({
+          apiKey: settings.steadfast_secondary_api_key,
+          secretKey: settings.steadfast_secondary_secret_key,
+          payload: {
+            ...payload,
+            invoice: `${payload.invoice}-B`.slice(0, 40),
+            note: `${payload.note} | Secondary account`,
+          },
+        })
       }
 
       const courierData = {
         ...(order.courier_data || {}),
-        steadfast: {
-          submitted_at: new Date().toISOString(),
-          request: payload,
-          response: data,
-          consignment: data.consignment || null,
-          consignment_id: data.consignment?.consignment_id || null,
-          tracking_code: data.consignment?.tracking_code || null,
-          status: data.consignment?.status || data.delivery_status || 'created',
-        },
+        steadfast: normalizeSteadfastSubmission(payload, primaryData),
+        ...(secondaryData ? {
+          steadfast_secondary: normalizeSteadfastSubmission({
+            ...payload,
+            invoice: `${payload.invoice}-B`.slice(0, 40),
+            note: `${payload.note} | Secondary account`,
+          }, secondaryData),
+        } : {}),
       }
 
       const { error } = await (supabase as any)
@@ -388,6 +432,7 @@ export default function AdminOrders() {
                 : 'Anonymous'
               const delivery = getDeliveryDetails(order)
               const courier = getCourierSubmission(order)
+              const secondaryCourier = getCourierSubmission(order, 'secondary')
 
               return (
                 <motion.article
@@ -453,7 +498,7 @@ export default function AdminOrders() {
                         }}
                       >
                         {courier ? <CheckCircle size={14} /> : submittingCourierId === order.id ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
-                        {courier ? 'Sent to Courier' : submittingCourierId === order.id ? 'Sending...' : 'Send Courier'}
+                        {courier ? secondaryCourier ? 'Sent to Both' : 'Sent Primary' : submittingCourierId === order.id ? 'Sending...' : 'Send Courier'}
                       </button>
                     </div>
                   </div>
@@ -491,6 +536,7 @@ export default function AdminOrders() {
                     : 'Anonymous'
                   const delivery = getDeliveryDetails(order)
                   const courier = getCourierSubmission(order)
+                  const secondaryCourier = getCourierSubmission(order, 'secondary')
 
                   return (
                     <motion.tr 
@@ -559,11 +605,11 @@ export default function AdminOrders() {
                           }}
                         >
                           {courier ? <CheckCircle size={14} /> : submittingCourierId === order.id ? <RefreshCw size={14} className="animate-spin" /> : <Send size={14} />}
-                          {courier ? 'Sent' : submittingCourierId === order.id ? 'Sending' : 'Send'}
+                          {courier ? secondaryCourier ? 'Both Sent' : 'Primary Sent' : submittingCourierId === order.id ? 'Sending' : 'Send'}
                         </button>
                         {courier?.tracking_code && (
                           <p className="mt-2 text-[9px] font-black tracking-widest uppercase" style={{ color: '#059669' }}>
-                            {courier.tracking_code}
+                            {courier.tracking_code}{secondaryCourier?.tracking_code ? ` / ${secondaryCourier.tracking_code}` : ''}
                           </p>
                         )}
                       </td>
@@ -715,19 +761,47 @@ export default function AdminOrders() {
                   </div>
 
                   {getCourierSubmission(selectedOrder) ? (
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                      <div className="rounded-2xl p-4" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)' }}>
-                        <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: '#a09a90' }}>Consignment ID</p>
-                        <p className="text-[13px] font-bold" style={{ color: '#181511' }}>{getCourierSubmission(selectedOrder).consignment_id || 'N/A'}</p>
-                      </div>
-                      <div className="rounded-2xl p-4" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)' }}>
-                        <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: '#a09a90' }}>Tracking Code</p>
-                        <p className="text-[13px] font-bold" style={{ color: '#181511' }}>{getCourierSubmission(selectedOrder).tracking_code || 'N/A'}</p>
-                      </div>
-                      <div className="rounded-2xl p-4" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)' }}>
-                        <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: '#a09a90' }}>Courier Status</p>
-                        <p className="text-[13px] font-bold capitalize" style={{ color: '#181511' }}>{getCourierSubmission(selectedOrder).status || 'created'}</p>
-                      </div>
+                    <div className="grid grid-cols-1 gap-3">
+                      {([
+                        ['Primary Account', getCourierSubmission(selectedOrder)],
+                        ['Second Account', getCourierSubmission(selectedOrder, 'secondary')],
+                      ] as [string, any][]).map(([label, submission]) => (
+                        <div key={label} className="rounded-2xl p-4" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)' }}>
+                          <div className="mb-3 flex items-center justify-between gap-3">
+                            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: '#181511' }}>{label}</p>
+                            <span
+                              className="rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest"
+                              style={{
+                                background: submission ? '#ecfdf5' : '#f5f0ea',
+                                color: submission ? '#059669' : '#71675d',
+                              }}
+                            >
+                              {submission ? 'Sent' : 'Skipped'}
+                            </span>
+                          </div>
+
+                          {submission ? (
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                              <div>
+                                <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: '#a09a90' }}>Consignment ID</p>
+                                <p className="text-[13px] font-bold" style={{ color: '#181511' }}>{submission.consignment_id || 'N/A'}</p>
+                              </div>
+                              <div>
+                                <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: '#a09a90' }}>Tracking Code</p>
+                                <p className="text-[13px] font-bold" style={{ color: '#181511' }}>{submission.tracking_code || 'N/A'}</p>
+                              </div>
+                              <div>
+                                <p className="text-[9px] font-black uppercase tracking-widest mb-1" style={{ color: '#a09a90' }}>Courier Status</p>
+                                <p className="text-[13px] font-bold capitalize" style={{ color: '#181511' }}>{submission.status || 'created'}</p>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-[12px] font-medium" style={{ color: '#71675d' }}>
+                              Second account keys were blank when this order was sent.
+                            </p>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   ) : (
                     <div className="flex items-start gap-3 rounded-2xl p-4" style={{ background: '#fff7ed', border: '1px solid #fed7aa' }}>
