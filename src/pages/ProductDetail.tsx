@@ -65,8 +65,8 @@ function DetailAccordion({ title, children, defaultOpen = false }: { title: stri
 
 function NoteItem({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-3 p-5 rounded-2xl border bg-white/40" style={{ borderColor: 'rgba(24,21,17,0.06)' }}>
-      <div className="flex items-center gap-2">
+    <div className="flex flex-col items-center gap-3 rounded-2xl border bg-white/40 p-5 text-center sm:items-start sm:text-left" style={{ borderColor: 'rgba(24,21,17,0.06)' }}>
+      <div className="flex items-center justify-center gap-2 sm:justify-start">
         <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(201,164,114,0.1)' }}>
           <Icon size={14} style={{ color: '#c9a472' }} />
         </div>
@@ -265,8 +265,8 @@ export default function ProductDetail() {
           </div>
 
           {/* ── Info ── */}
-          <div className="flex flex-col">
-            <div className="flex items-center gap-3 mb-4">
+          <div className="flex flex-col text-center sm:text-left">
+            <div className="mb-4 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
               <div className="flex items-center gap-1">
                 {[1, 2, 3, 4, 5].map(s => <Star key={s} size={14} fill="#c9a472" stroke="none" />)}
               </div>
@@ -275,11 +275,11 @@ export default function ProductDetail() {
               <span className="text-[12px] font-medium text-[#71675d]">142 Verified Reviews</span>
             </div>
 
-            <h1 className="text-[42px] font-bold leading-[1.1] mb-6 text-[#181511]" style={{ fontFamily: "'Playfair Display', serif" }}>
+            <h1 className="mb-6 text-center text-[42px] font-bold leading-[1.1] text-[#181511] sm:text-left" style={{ fontFamily: "'Playfair Display', serif" }}>
               {product.name}
             </h1>
 
-            <div className="flex items-baseline gap-4 mb-8">
+            <div className="mb-8 flex items-baseline justify-center gap-4 sm:justify-start">
               <span className="text-[28px] font-bold text-[#181511]">
                 {formatPrice(selectedVariant ? selectedVariant.price : product.price)}
               </span>
@@ -293,8 +293,8 @@ export default function ProductDetail() {
             {/* Size Selection */}
             {product.variants && product.variants.length > 0 && (
               <div className="mb-10">
-                <p className="text-[10px] font-black tracking-[0.2em] uppercase mb-4" style={{ color: '#71675d' }}>Select Size</p>
-                <div className="flex flex-wrap gap-3">
+                <p className="mb-4 text-center text-[10px] font-black uppercase tracking-[0.2em] sm:text-left" style={{ color: '#71675d' }}>Select Size</p>
+                <div className="flex flex-wrap justify-center gap-3 sm:justify-start">
                   {product.variants.map((variant, i) => (
                     <button
                       key={i}
@@ -312,7 +312,7 @@ export default function ProductDetail() {
               </div>
             )}
 
-            <p className="text-[15px] leading-[1.8] text-[#5a5048] mb-10 max-w-lg">
+            <p className="mx-auto mb-10 max-w-lg text-center text-[15px] leading-[1.8] text-[#5a5048] sm:mx-0 sm:text-left">
               {product.description || 'A masterpiece of olfactory precision, crafted for those who define elegance through subtlety. This extrait de parfum evolves gracefully throughout the day, leaving a trail of quiet confidence.'}
             </p>
 
@@ -324,8 +324,8 @@ export default function ProductDetail() {
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <div className="flex items-center h-[56px] rounded-2xl bg-white border px-2" style={{ borderColor: 'rgba(24,21,17,0.1)' }}>
+            <div className="mx-auto mb-10 flex w-full max-w-[23rem] flex-col items-center gap-4 sm:mx-0 sm:max-w-none sm:flex-row">
+              <div className="flex h-[56px] w-full items-center justify-center rounded-2xl border bg-white px-2 sm:w-auto" style={{ borderColor: 'rgba(24,21,17,0.1)' }}>
                 <button 
                   onClick={() => setQty(Math.max(1, qty - 1))}
                   className="w-12 h-12 flex items-center justify-center text-[#71675d] hover:text-[#181511] transition-colors"
@@ -343,7 +343,7 @@ export default function ProductDetail() {
 
               <button
                 onClick={handleAdd}
-                className="flex-1 h-[56px] flex items-center justify-center gap-3 rounded-2xl text-[12px] font-black tracking-[0.2em] uppercase text-white transition-all duration-300 active:scale-[0.98] group"
+                className="group flex h-[56px] w-full items-center justify-center gap-3 rounded-2xl px-5 text-[11px] font-black uppercase tracking-[0.18em] text-white transition-all duration-300 active:scale-[0.98] sm:flex-1 sm:px-7 sm:text-[12px] sm:tracking-[0.2em]"
                 style={{ 
                   background: '#181511',
                   boxShadow: '0 8px 30px rgba(11,19,27,0.15)'
@@ -359,8 +359,12 @@ export default function ProductDetail() {
                   el.style.boxShadow = '0 8px 30px rgba(11,19,27,0.15)'
                 }}
               >
-                <ShoppingBag size={18} strokeWidth={2} />
-                Add to Bag — {formatPrice((selectedVariant ? selectedVariant.price : product.price) * qty)}
+                <ShoppingBag size={18} strokeWidth={2} className="shrink-0" />
+                <span className="flex min-w-0 flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center leading-none">
+                  <span>Add to Bag</span>
+                  <span className="h-px w-6 bg-white/45" />
+                  <span>{formatPrice((selectedVariant ? selectedVariant.price : product.price) * qty)}</span>
+                </span>
               </button>
             </div>
 

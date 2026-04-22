@@ -40,11 +40,13 @@ function getOrderCustomerName(order: any) {
 
 function getOrderAddress(order: any) {
   const address = order.shipping_address || {}
-  return [
-    address.address || address.address_line1,
-    address.city,
-    address.postalCode || address.postal_code,
-  ].filter(Boolean).join(', ')
+  const fullAddress = address.address || address.address_line1 || ''
+  const city = address.city || ''
+  const postalCode = address.postalCode || address.postal_code || ''
+
+  return [fullAddress, city, postalCode]
+    .filter((part, index, parts) => Boolean(part) && parts.indexOf(part) === index)
+    .join(', ')
 }
 
 function buildSteadfastPayload(order: any) {

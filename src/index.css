@@ -110,6 +110,10 @@ body.menu-open {
   overflow: hidden;
 }
 
+body.order-block-open {
+  overflow: hidden;
+}
+
 a {
   color: inherit;
 }

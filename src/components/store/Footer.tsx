@@ -129,14 +129,24 @@ export default function Footer() {
 
       {/* ─── Bottom Bar ─── */}
       <div className="border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-        <div className="container-site py-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>
-            © {new Date().getFullYear()} Velour. Crafted for a premium digital experience.
+        <div className="container-site flex flex-col items-center justify-center gap-5 py-8 text-center md:flex-row md:justify-between md:text-left">
+          <p className="max-w-[18rem] text-center text-[9px] font-black uppercase leading-6 tracking-[0.18em] md:max-w-none md:text-left md:text-[10px] md:tracking-[0.2em]" style={{ color: 'rgba(255,255,255,0.34)' }}>
+            &copy; {new Date().getFullYear()} Velour. Crafted for a premium digital experience.
           </p>
-          <div className="flex items-center gap-2 text-[10px] font-bold tracking-[0.1em] uppercase" style={{ color: 'rgba(201,164,114,0.6)' }}>
-            <Sparkles size={12} strokeWidth={2.5} />
-            <span>Responsive Luxury Storefront</span>
-          </div>
+          <a
+            href="https://shakhwatrasel.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex max-w-[18rem] items-center justify-center gap-2 text-center text-[9px] font-bold uppercase leading-5 tracking-[0.16em] transition-colors hover:text-white md:max-w-none md:text-[10px] md:tracking-[0.12em]"
+            style={{ color: 'rgba(201,164,114,0.72)' }}
+          >
+            <Sparkles size={12} strokeWidth={2.5} className="shrink-0" />
+            <span className="text-balance">Developed by Shakhwat Hossain Rasel</span>
+            <ArrowUpRight
+              size={13}
+              className="shrink-0 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+            />
+          </a>
         </div>
       </div>
     </footer>

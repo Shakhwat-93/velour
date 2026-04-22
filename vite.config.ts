@@ -26,6 +26,19 @@ const sendJson = (response: ServerResponse, statusCode: number, payload: unknown
 const steadfastDevApi = () => ({
   name: 'steadfast-dev-api',
   configureServer(server: any) {
+    server.middlewares.use('/api/client-meta', async (request: IncomingMessage, response: ServerResponse) => {
+      if (request.method !== 'GET') {
+        response.setHeader('Allow', 'GET')
+        sendJson(response, 405, { error: 'Method not allowed.' })
+        return
+      }
+
+      sendJson(response, 200, {
+        ip: request.socket.remoteAddress || 'unknown',
+        userAgent: request.headers['user-agent'] || '',
+      })
+    })
+
     server.middlewares.use('/api/steadfast', async (request: IncomingMessage, response: ServerResponse) => {
       if (request.method !== 'POST') {
         response.setHeader('Allow', 'POST')

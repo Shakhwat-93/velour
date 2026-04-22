@@ -18,12 +18,12 @@ export default function CartDrawer() {
       )}
 
       <aside
-        className={`fixed right-0 top-0 z-[201] flex h-full w-full max-w-[28rem] flex-col border-l border-border-subtle bg-surface shadow-[0_18px_60px_rgba(11,19,27,0.16)] transition-transform duration-300 ${
+        className={`fixed right-0 top-0 z-[201] flex h-dvh w-full max-w-[28rem] flex-col overflow-hidden border-l border-border-subtle bg-[#fffcf7] shadow-[0_18px_60px_rgba(11,19,27,0.16)] transition-transform duration-300 ${
           state.isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         aria-hidden={!state.isOpen}
       >
-        <div className="flex items-center justify-between border-b border-border-light px-5 py-5 sm:px-6">
+        <div className="flex items-center justify-between border-b border-border-light bg-white px-5 py-5 sm:px-6">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-bg-secondary text-brand-gold">
               <ShoppingBag size={18} strokeWidth={1.8} />
@@ -45,7 +45,7 @@ export default function CartDrawer() {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+        <div className="flex-1 overflow-y-auto bg-[#fffcf7] px-5 py-6 sm:px-7">
           {state.items.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <div className="flex h-20 w-20 items-center justify-center rounded-full bg-bg-secondary text-brand-gold/45">
@@ -60,22 +60,22 @@ export default function CartDrawer() {
               </button>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-5">
               {state.items.map(({ product, qty, selectedSize, selectedPrice }) => (
                 <div
                   key={`${product.id}-${selectedSize}`}
-                  className="rounded-[1.4rem] border border-border-subtle bg-bg-primary/65 p-4"
+                  className="overflow-hidden rounded-[1.65rem] border border-border-subtle bg-white p-4 shadow-[0_14px_34px_rgba(11,19,27,0.07)] sm:p-5"
                 >
-                  <div className="flex gap-4">
+                  <div className="grid grid-cols-[5.25rem_1fr] gap-4">
                     <div className="h-24 w-20 shrink-0 overflow-hidden rounded-[1rem] bg-bg-secondary">
                       {product.images?.[0] && (
                         <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
                       )}
                     </div>
 
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0">
                       <div className="flex items-start justify-between gap-3">
-                        <div>
+                        <div className="min-w-0">
                           <p className="truncate text-sm font-semibold text-text-primary">{product.name}</p>
                           <p className="mt-1 text-[0.66rem] uppercase tracking-[0.2em] text-brand-gold/70">
                             {selectedSize || 'Extrait de Parfum'}
@@ -90,8 +90,10 @@ export default function CartDrawer() {
                         </button>
                       </div>
 
-                      <div className="mt-4 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-2 rounded-full border border-border-light bg-surface px-2 py-1.5">
+                    </div>
+
+                    <div className="col-span-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-[1.25rem] border border-border-light bg-[#fffcf7] p-2">
+                        <div className="flex w-fit items-center gap-2 rounded-full border border-border-light bg-white px-2 py-1.5">
                           <button
                             onClick={() => updateQty(product.id, qty - 1, selectedSize)}
                             className="flex h-8 w-8 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-bg-secondary hover:text-text-primary"
@@ -107,10 +109,9 @@ export default function CartDrawer() {
                           </button>
                         </div>
 
-                        <p className="text-sm font-semibold text-text-primary">
+                        <p className="min-w-[4.75rem] whitespace-nowrap text-right text-sm font-bold text-text-primary">
                           {formatPrice((selectedPrice ?? product.price) * qty)}
                         </p>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -120,12 +121,14 @@ export default function CartDrawer() {
         </div>
 
         {state.items.length > 0 && (
-          <div className="border-t border-border-light bg-bg-primary px-5 py-5 sm:px-6">
-            <div className="mb-2 flex items-center justify-between text-sm">
-              <span className="text-text-muted">Subtotal</span>
-              <span className="font-semibold text-text-primary">{formatPrice(subtotal)}</span>
+          <div className="border-t border-border-light bg-white px-5 py-5 shadow-[0_-16px_40px_rgba(11,19,27,0.06)] sm:px-7">
+            <div className="mb-4 rounded-[1.35rem] border border-border-light bg-[#fffcf7] px-4 py-3">
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <span className="text-text-muted">Subtotal</span>
+                <span className="whitespace-nowrap text-base font-black text-text-primary">{formatPrice(subtotal)}</span>
+              </div>
+              <p className="mt-1 text-xs leading-5 text-text-muted">Shipping and taxes are calculated at checkout.</p>
             </div>
-            <p className="mb-5 text-xs leading-5 text-text-muted">Shipping and taxes are calculated at checkout.</p>
 
             <Link
               to="/checkout"

@@ -70,6 +70,13 @@ export interface ShippingAddress {
   delivery_area?: DeliveryArea
   delivery_label?: string
   delivery_fee?: number
+  anti_fraud?: {
+    device_id: string
+    ip_address: string
+    user_agent?: string
+    checked_at: string
+    lock_hours: number
+  }
 }
 
 export interface Order {
