@@ -380,8 +380,8 @@ export default function ProductDetail() {
                   <Truck size={20} />
                 </div>
                 <div>
-                  <p className="text-[12px] font-bold text-[#181511]">Free Shipping</p>
-                  <p className="text-[11px] text-[#71675d]">On orders over {formatPrice(5000)}</p>
+                  <p className="text-[12px] font-bold text-[#181511]">Fast Delivery</p>
+                  <p className="text-[11px] text-[#71675d]">Dhaka {formatPrice(80)} · Outside {formatPrice(130)}</p>
                 </div>
               </div>
             </div>
@@ -394,8 +394,8 @@ export default function ProductDetail() {
               <DetailAccordion title="Ingredients">
                 Alcohol Denat., Parfum (Fragrance), Aqua (Water), Limonene, Linalool, Citronellol, Geraniol, Coumarin, Citral, Benzyl Benzoate, Eugenol.
               </DetailAccordion>
-              <DetailAccordion title="Shipping & Returns">
-                We offer premium shipping worldwide. Domestic orders arrive in 2-3 business days. Due to the nature of fragrances, we accept returns within 14 days only if the security seal is intact.
+              <DetailAccordion title="Delivery & Returns">
+                Delivery charge is {formatPrice(80)} inside Dhaka and {formatPrice(130)} outside Dhaka. Due to the nature of fragrances, we accept returns within 14 days only if the security seal is intact.
               </DetailAccordion>
             </div>
           </div>

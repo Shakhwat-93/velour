@@ -100,15 +100,15 @@ export default function AdminCategories() {
   }
 
   return (
-    <div className="space-y-12 pb-32">
+    <div className="space-y-8 sm:space-y-12 pb-24 sm:pb-32">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8">
         <div>
-          <h4 className="text-[10px] font-black tracking-[0.4em] uppercase mb-3" style={{ color: '#c9a472' }}>Management</h4>
-          <h1 className="text-[36px] md:text-[44px] font-bold tracking-tight mb-2" style={{ fontFamily: "'Playfair Display', serif", color: '#181511', lineHeight: 1.1 }}>
+          <h4 className="text-[10px] font-black tracking-[0.4em] uppercase mb-2 sm:mb-3" style={{ color: '#c9a472' }}>Management</h4>
+          <h1 className="text-[28px] sm:text-[36px] md:text-[44px] font-bold tracking-tight mb-2" style={{ fontFamily: "'Playfair Display', serif", color: '#181511', lineHeight: 1.1 }}>
             Categories
           </h1>
-          <p className="text-[14px] font-medium" style={{ color: '#71675d' }}>
+          <p className="text-[13px] sm:text-[14px] font-medium" style={{ color: '#71675d' }}>
             Managing <span style={{ color: '#181511', fontWeight: 800 }}>{categories.length}</span> product categories.
           </p>
         </div>
@@ -118,7 +118,7 @@ export default function AdminCategories() {
             whileHover={{ y: -2 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => { setShowForm(true); setEditingId(null); setForm(INITIAL_FORM) }}
-            className="inline-flex items-center gap-3 px-8 h-14 rounded-2xl text-[11px] font-black tracking-[0.1em] uppercase transition-all shadow-md hover:shadow-lg"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-3 px-6 sm:px-8 h-12 sm:h-14 rounded-2xl text-[11px] font-black tracking-[0.1em] uppercase transition-all shadow-md hover:shadow-lg"
             style={{ background: '#181511', color: '#fff' }}
           >
             <Plus size={16} strokeWidth={2.5} />
@@ -137,31 +137,31 @@ export default function AdminCategories() {
             className="rounded-[24px] overflow-hidden"
             style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }}
           >
-            <div className="px-10 py-8 border-b flex justify-between items-center" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
-              <div className="flex items-center gap-5">
-                <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
-                  <FolderOpen size={24} style={{ color: '#181511' }} strokeWidth={1.5} />
+            <div className="px-5 sm:px-10 py-5 sm:py-8 border-b flex justify-between items-center gap-4" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+              <div className="min-w-0 flex items-center gap-4 sm:gap-5">
+                <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+                  <FolderOpen size={20} className="sm:size-6" style={{ color: '#181511' }} strokeWidth={1.5} />
                 </div>
                 <div>
-                  <h2 className="text-[24px] font-bold tracking-tight" style={{ color: '#181511', fontFamily: "'Playfair Display', serif" }}>
+                  <h2 className="text-[19px] sm:text-[24px] font-bold tracking-tight" style={{ color: '#181511', fontFamily: "'Playfair Display', serif" }}>
                     {editingId ? 'Edit Category' : 'Create Category'}
                   </h2>
-                  <p className="text-[11px] font-medium mt-1" style={{ color: '#71675d' }}>Category Details</p>
+                  <p className="text-[10px] sm:text-[11px] font-medium mt-0.5 sm:mt-1" style={{ color: '#71675d' }}>Category Details</p>
                 </div>
               </div>
               <button 
                 onClick={cancelForm} 
-                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
+                className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all duration-300 shrink-0"
                 style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', color: '#71675d' }}
                 onMouseEnter={(e) => { e.currentTarget.style.color = '#181511'; e.currentTarget.style.borderColor = 'rgba(24,21,17,0.1)' }}
                 onMouseLeave={(e) => { e.currentTarget.style.color = '#71675d'; e.currentTarget.style.borderColor = 'rgba(24,21,17,0.06)' }}
               >
-                <X size={20} strokeWidth={2} />
+                <X size={18} className="sm:size-5" strokeWidth={2} />
               </button>
             </div>
 
-            <form onSubmit={handleSave} className="p-10 space-y-8">
-              <div className="space-y-8">
+            <form onSubmit={handleSave} className="p-5 sm:p-10 space-y-6 sm:space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 <div className="space-y-3">
                   <label className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#181511' }}>
                     <Type size={14} style={{ color: '#c9a472' }} /> Category Name
@@ -170,7 +170,7 @@ export default function AdminCategories() {
                     required type="text" 
                     value={form.name} placeholder="e.g. Perfumes" 
                     onChange={e => setForm({ ...form, name: e.target.value })}
-                    className="w-full h-14 px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                    className="w-full h-12 sm:h-14 px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
                     style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
                     onFocus={(e) => e.target.style.borderColor = 'rgba(201,164,114,0.4)'}
                     onBlur={(e) => e.target.style.borderColor = 'rgba(24,21,17,0.06)'}
@@ -223,7 +223,7 @@ export default function AdminCategories() {
                       type="text" 
                       value={form.image_url} placeholder="https://..." 
                       onChange={e => setForm({ ...form, image_url: e.target.value })}
-                      className="w-full h-14 px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                      className="w-full h-12 sm:h-14 px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
                       style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
                       onFocus={(e) => e.target.style.borderColor = 'rgba(201,164,114,0.4)'}
                       onBlur={(e) => e.target.style.borderColor = 'rgba(24,21,17,0.06)'}
@@ -248,11 +248,11 @@ export default function AdminCategories() {
                 />
               </div>
 
-              <div className="pt-6 flex gap-4">
+              <div className="pt-3 sm:pt-6 flex flex-col sm:flex-row gap-4">
                 <button 
                   type="button" 
                   onClick={cancelForm} 
-                  className="px-8 h-14 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all"
+                  className="w-full sm:w-auto px-8 h-12 sm:h-14 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all"
                   style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#71675d' }}
                   onMouseEnter={(e) => e.currentTarget.style.color = '#181511'}
                   onMouseLeave={(e) => e.currentTarget.style.color = '#71675d'}
@@ -262,7 +262,7 @@ export default function AdminCategories() {
                 <button 
                   type="submit" 
                   disabled={saving} 
-                  className="flex-1 h-14 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all shadow-md flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"
+                  className="flex-1 h-12 sm:h-14 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all shadow-md flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"
                   style={{ background: '#181511', color: '#fff' }}
                 >
                   {saving ? (
@@ -293,7 +293,7 @@ export default function AdminCategories() {
           <p className="text-[13px]" style={{ color: '#71675d' }}>Create a category to get started.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {categories.map((cat, idx) => (
             <motion.div
               key={cat.id}
@@ -312,7 +312,7 @@ export default function AdminCategories() {
               }}
             >
               {/* Image Preview */}
-              <div className="h-56 relative overflow-hidden" style={{ background: '#faf9f7' }}>
+              <div className="h-48 sm:h-56 relative overflow-hidden" style={{ background: '#faf9f7' }}>
                 {cat.image_url ? (
                   <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 ) : (
@@ -322,7 +322,7 @@ export default function AdminCategories() {
                 )}
                 
                 {/* Actions Overlay */}
-                <div className="absolute inset-0 bg-[#181511]/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-4 backdrop-blur-sm">
+                <div className="absolute inset-0 bg-[#181511]/40 opacity-0 group-hover:opacity-100 transition-all duration-300 hidden sm:flex items-center justify-center gap-4 backdrop-blur-sm">
                   <button 
                     onClick={() => startEdit(cat)} 
                     className="w-12 h-12 rounded-xl bg-white text-[#181511] flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-lg"
@@ -339,17 +339,36 @@ export default function AdminCategories() {
                 </div>
               </div>
               
-              <div className="p-8 flex flex-col flex-1">
-                <h3 className="text-[20px] font-bold tracking-tight mb-3" style={{ color: '#181511' }}>{cat.name}</h3>
+              <div className="p-5 sm:p-8 flex flex-col flex-1">
+                <h3 className="text-[18px] sm:text-[20px] font-bold tracking-tight mb-3" style={{ color: '#181511' }}>{cat.name}</h3>
                 
                 <p className="text-[13px] line-clamp-2 leading-relaxed flex-1 mb-6" style={{ color: '#71675d' }}>
                   {cat.description || 'No description provided.'}
                 </p>
                 
-                <div className="flex items-center justify-between pt-5 border-t" style={{ borderColor: 'rgba(24,21,17,0.06)' }}>
-                  <div className="flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-lg" style={{ background: '#faf9f7', color: '#181511' }}>
+                <div className="flex items-center justify-between gap-3 pt-5 border-t" style={{ borderColor: 'rgba(24,21,17,0.06)' }}>
+                  <div className="min-w-0 flex items-center gap-1.5 text-[11px] font-medium px-3 py-1.5 rounded-lg" style={{ background: '#faf9f7', color: '#181511' }}>
                     <Globe size={12} style={{ color: '#a09a90' }} />
-                    /{cat.slug}
+                    <span className="truncate">/{cat.slug}</span>
+                  </div>
+                  <div className="flex sm:hidden items-center gap-2 shrink-0">
+                    <button 
+                      onClick={() => startEdit(cat)} 
+                      className="w-10 h-10 rounded-xl bg-[#faf9f7] text-[#181511] flex items-center justify-center transition-all active:scale-95"
+                      style={{ border: '1px solid rgba(24,21,17,0.06)' }}
+                      title="Edit"
+                    >
+                      <Edit size={15} strokeWidth={2} />
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(cat.id)} 
+                      disabled={deletingId === cat.id}
+                      className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center transition-all active:scale-95 disabled:opacity-50"
+                      style={{ border: '1px solid rgba(239,68,68,0.16)' }}
+                      title="Delete"
+                    >
+                      <Trash2 size={15} strokeWidth={2} />
+                    </button>
                   </div>
                 </div>
               </div>

@@ -26,7 +26,7 @@ function StatCard({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.4 }}
-      className="rounded-[24px] p-8"
+      className="rounded-[24px] p-6 sm:p-8"
       style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }}
     >
       <div className="flex items-center justify-between mb-6">
@@ -37,7 +37,7 @@ function StatCard({
       <p className="text-[11px] font-black tracking-[0.2em] uppercase mb-2" style={{ color: '#71675d' }}>
         {label}
       </p>
-      <p className="text-[32px] font-bold leading-none tracking-tight" style={{ fontFamily: "'Playfair Display', serif", color: '#181511' }}>
+      <p className="text-[28px] sm:text-[32px] font-bold leading-none tracking-tight" style={{ fontFamily: "'Playfair Display', serif", color: '#181511' }}>
         {value}
       </p>
     </motion.div>
@@ -84,20 +84,20 @@ export default function AdminDashboard() {
   )
 
   return (
-    <div className="space-y-10 pb-32 max-w-[1400px]">
+    <div className="space-y-8 sm:space-y-10 pb-24 sm:pb-32 max-w-[1400px]">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-5 sm:gap-6">
         <div>
-          <h4 className="text-[10px] font-black tracking-[0.4em] uppercase mb-3" style={{ color: '#c9a472' }}>Overview</h4>
-          <h1 className="text-[36px] md:text-[44px] font-bold tracking-tight mb-2" style={{ fontFamily: "'Playfair Display', serif", color: '#181511', lineHeight: 1.1 }}>
+          <h4 className="text-[10px] font-black tracking-[0.4em] uppercase mb-2 sm:mb-3" style={{ color: '#c9a472' }}>Overview</h4>
+          <h1 className="text-[28px] sm:text-[36px] md:text-[44px] font-bold tracking-tight mb-2" style={{ fontFamily: "'Playfair Display', serif", color: '#181511', lineHeight: 1.1 }}>
             Dashboard
           </h1>
         </div>
 
         <Link
           to="/admin/products/new"
-          className="inline-flex items-center gap-3 px-8 h-12 rounded-xl text-[11px] font-black tracking-[0.1em] uppercase transition-all shadow-md hover:shadow-lg"
+          className="inline-flex w-full sm:w-auto items-center justify-center gap-3 px-8 h-12 rounded-xl text-[11px] font-black tracking-[0.1em] uppercase transition-all shadow-md hover:shadow-lg"
           style={{ background: '#181511', color: '#fff' }}
         >
           <Plus size={16} strokeWidth={2.5} />
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
       {noAdmin && (
         <motion.div
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          className="flex items-center justify-between gap-4 p-5 rounded-2xl border"
+          className="flex flex-col items-start gap-4 p-5 rounded-2xl border sm:flex-row sm:items-center sm:justify-between"
           style={{ background: '#fef2f2', borderColor: '#fecaca' }}
         >
           <div className="flex items-center gap-3">
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
           </div>
           <button
             onClick={fixAdmin}
-            className="px-6 py-2.5 rounded-lg text-[11px] font-black tracking-widest uppercase text-white shadow-md"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-lg text-[11px] font-black tracking-widest uppercase text-white shadow-md"
             style={{ background: '#dc2626' }}
           >
             Fix Now
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
         <StatCard label="Total Revenue" value={formatPrice(stats.revenue)} icon={DollarSign} delay={0} />
         <StatCard label="Total Orders" value={stats.orders} icon={ShoppingBag} delay={0.05} />
         <StatCard label="Total Products" value={stats.products} icon={Package} delay={0.1} />
@@ -139,8 +139,8 @@ export default function AdminDashboard() {
 
         {/* Recent Orders List */}
         <div className="xl:col-span-2 rounded-[24px] overflow-hidden" style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }}>
-          <div className="flex items-center justify-between px-8 py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
-            <h2 className="text-[18px] font-bold tracking-tight" style={{ color: '#181511' }}>Recent Orders</h2>
+          <div className="flex items-center justify-between px-5 sm:px-8 py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+            <h2 className="text-[16px] sm:text-[18px] font-bold tracking-tight" style={{ color: '#181511' }}>Recent Orders</h2>
             <Link to="/admin/orders" className="text-[11px] font-black tracking-widest uppercase hover:underline" style={{ color: '#c9a472' }}>
               View All
             </Link>
@@ -152,14 +152,43 @@ export default function AdminDashboard() {
               <p className="text-[14px] font-medium" style={{ color: '#71675d' }}>No recent orders</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <>
+            <div className="sm:hidden divide-y" style={{ borderColor: 'rgba(24,21,17,0.06)' }}>
+              {orders.map((o) => {
+                const s = STATUS[o.status] || { label: o.status, color: '#71675d', bg: '#f5f0ea' }
+                return (
+                  <Link
+                    key={o.id}
+                    to="/admin/orders"
+                    className="block px-5 py-4 transition-colors active:bg-[#faf9f7]"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-bold tracking-widest" style={{ color: '#181511' }}>
+                          #{o.id.split('-')[0].toUpperCase()}
+                        </p>
+                        <p className="mt-1 truncate text-[13px] font-bold" style={{ color: '#181511' }}>
+                          {o.shipping_address?.firstName || 'Guest'} {o.shipping_address?.lastName || ''}
+                        </p>
+                      </div>
+                      <p className="shrink-0 text-[14px] font-bold" style={{ color: '#181511' }}>{formatPrice(o.total)}</p>
+                    </div>
+                    <span className="mt-3 inline-flex px-3 py-1.5 rounded-lg text-[9px] font-bold uppercase tracking-widest border" style={{ background: s.bg, color: s.color, borderColor: s.color + '40' }}>
+                      {s.label}
+                    </span>
+                  </Link>
+                )
+              })}
+            </div>
+
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
                   <tr style={{ background: '#faf9f7', borderBottom: '1px solid rgba(24,21,17,0.06)' }}>
-                    <th className="px-8 py-4 text-[9px] font-black tracking-[0.2em] uppercase" style={{ color: '#a09a90' }}>Order ID</th>
-                    <th className="px-8 py-4 text-[9px] font-black tracking-[0.2em] uppercase" style={{ color: '#a09a90' }}>Customer</th>
-                    <th className="px-8 py-4 text-[9px] font-black tracking-[0.2em] uppercase" style={{ color: '#a09a90' }}>Status</th>
-                    <th className="px-8 py-4 text-[9px] font-black tracking-[0.2em] uppercase text-right" style={{ color: '#a09a90' }}>Amount</th>
+                    <th className="px-5 sm:px-8 py-4 text-[9px] font-black tracking-[0.2em] uppercase" style={{ color: '#a09a90' }}>Order ID</th>
+                    <th className="px-5 sm:px-8 py-4 text-[9px] font-black tracking-[0.2em] uppercase" style={{ color: '#a09a90' }}>Customer</th>
+                    <th className="px-5 sm:px-8 py-4 text-[9px] font-black tracking-[0.2em] uppercase" style={{ color: '#a09a90' }}>Status</th>
+                    <th className="px-5 sm:px-8 py-4 text-[9px] font-black tracking-[0.2em] uppercase text-right" style={{ color: '#a09a90' }}>Amount</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y" style={{ borderColor: 'rgba(24,21,17,0.04)' }}>
@@ -167,22 +196,22 @@ export default function AdminDashboard() {
                     const s = STATUS[o.status] || { label: o.status, color: '#71675d', bg: '#f5f0ea' }
                     return (
                       <tr key={o.id} className="transition-colors hover:bg-[#faf9f7]" style={{ background: '#fff' }}>
-                        <td className="px-8 py-5">
+                        <td className="px-5 sm:px-8 py-5">
                           <span className="text-[11px] font-bold tracking-widest" style={{ color: '#181511' }}>
                             #{o.id.split('-')[0].toUpperCase()}
                           </span>
                         </td>
-                        <td className="px-8 py-5">
+                        <td className="px-5 sm:px-8 py-5">
                           <p className="text-[14px] font-bold" style={{ color: '#181511' }}>
                             {o.shipping_address?.firstName || 'Guest'} {o.shipping_address?.lastName || ''}
                           </p>
                         </td>
-                        <td className="px-8 py-5">
+                        <td className="px-5 sm:px-8 py-5">
                           <span className="px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest border" style={{ background: s.bg, color: s.color, borderColor: s.color + '40' }}>
                             {s.label}
                           </span>
                         </td>
-                        <td className="px-8 py-5 text-right">
+                        <td className="px-5 sm:px-8 py-5 text-right">
                           <p className="text-[15px] font-bold" style={{ color: '#181511' }}>{formatPrice(o.total)}</p>
                         </td>
                       </tr>
@@ -191,14 +220,15 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </div>
 
         {/* Quick Actions */}
         <div className="space-y-6">
           <div className="rounded-[24px] overflow-hidden" style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }}>
-            <div className="px-8 py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
-              <h2 className="text-[18px] font-bold tracking-tight" style={{ color: '#181511' }}>Quick Actions</h2>
+            <div className="px-5 sm:px-8 py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+              <h2 className="text-[16px] sm:text-[18px] font-bold tracking-tight" style={{ color: '#181511' }}>Quick Actions</h2>
             </div>
             <div className="divide-y" style={{ borderColor: 'rgba(24,21,17,0.04)' }}>
               {[
@@ -206,7 +236,7 @@ export default function AdminDashboard() {
                 { label: 'Categories', path: '/admin/categories', icon: ShoppingBag },
                 { label: 'Settings', path: '/admin/settings', icon: Settings },
               ].map(link => (
-                <Link key={link.path} to={link.path} className="flex items-center justify-between px-8 py-5 hover:bg-[#faf9f7] transition-colors group">
+                <Link key={link.path} to={link.path} className="flex items-center justify-between px-5 sm:px-8 py-5 hover:bg-[#faf9f7] transition-colors group">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)' }}>
                       <link.icon size={16} style={{ color: '#71675d' }} />

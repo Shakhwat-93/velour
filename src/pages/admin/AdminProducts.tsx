@@ -41,21 +41,21 @@ export default function AdminProducts() {
   )
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 sm:space-y-12 pb-24">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8">
         <div>
-          <h4 className="text-[10px] font-black tracking-[0.4em] uppercase mb-3" style={{ color: '#c9a472' }}>Inventory Control</h4>
-          <h1 className="text-[36px] md:text-[44px] font-bold tracking-tight mb-2" style={{ fontFamily: "'Playfair Display', serif", color: '#181511', lineHeight: 1.1 }}>
+          <h4 className="text-[10px] font-black tracking-[0.4em] uppercase mb-2 sm:mb-3" style={{ color: '#c9a472' }}>Inventory Control</h4>
+          <h1 className="text-[28px] sm:text-[36px] md:text-[44px] font-bold tracking-tight mb-2" style={{ fontFamily: "'Playfair Display', serif", color: '#181511', lineHeight: 1.1 }}>
             Products
           </h1>
-          <p className="text-[14px] font-medium" style={{ color: '#71675d' }}>
+          <p className="text-[13px] sm:text-[14px] font-medium" style={{ color: '#71675d' }}>
             Managing <span style={{ color: '#181511', fontWeight: 800 }}>{products.length}</span> signature fragrances in your collection.
           </p>
         </div>
         <Link
           to="/admin/products/new"
-          className="inline-flex items-center gap-3 px-8 h-14 rounded-2xl text-[11px] font-black tracking-[0.2em] uppercase transition-all duration-300 active:scale-95 group shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_32px_rgba(201,164,114,0.3)]"
+          className="inline-flex w-full sm:w-auto items-center justify-center gap-3 px-6 sm:px-8 h-12 sm:h-14 rounded-2xl text-[11px] font-black tracking-[0.16em] sm:tracking-[0.2em] uppercase transition-all duration-300 active:scale-95 group shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:shadow-[0_12px_32px_rgba(201,164,114,0.3)]"
           style={{ background: '#181511', color: '#fff' }}
         >
           <Plus size={16} strokeWidth={2.5} className="group-hover:rotate-90 transition-transform duration-500" style={{ color: '#c9a472' }} />
@@ -64,15 +64,15 @@ export default function AdminProducts() {
       </div>
 
       {/* Control Bar */}
-      <div className="flex flex-col sm:flex-row items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
         <div className="relative flex-1 group w-full">
-          <Search size={18} className="absolute left-6 top-1/2 -translate-y-1/2 transition-colors duration-300" style={{ color: '#a09a90' }} />
+          <Search size={18} className="absolute left-5 sm:left-6 top-1/2 -translate-y-1/2 transition-colors duration-300" style={{ color: '#a09a90' }} />
           <input
             type="text"
             placeholder="Search by name or category..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full h-14 pl-14 pr-6 rounded-2xl text-[14px] font-medium outline-none transition-all duration-300"
+            className="w-full h-12 sm:h-14 pl-12 sm:pl-14 pr-6 rounded-2xl text-[14px] font-medium outline-none transition-all duration-300"
             style={{ 
               background: '#fff', 
               border: '1px solid rgba(24,21,17,0.06)',
@@ -90,7 +90,7 @@ export default function AdminProducts() {
           />
         </div>
         <button 
-          className="h-14 px-8 rounded-2xl text-[11px] font-black tracking-[0.2em] uppercase flex items-center gap-3 transition-all duration-300"
+          className="w-full sm:w-auto h-12 sm:h-14 px-6 sm:px-8 rounded-2xl text-[11px] font-black tracking-[0.2em] uppercase flex items-center justify-center gap-3 transition-all duration-300"
           style={{ 
             background: '#fff', 
             border: '1px solid rgba(24,21,17,0.06)',
@@ -119,16 +119,99 @@ export default function AdminProducts() {
             <p className="text-[10px] font-black tracking-[0.3em] uppercase" style={{ color: '#71675d' }}>Syncing Collections...</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          <div className="lg:hidden divide-y" style={{ borderColor: 'rgba(24,21,17,0.06)' }}>
+            {filtered.length === 0 ? (
+              <div className="px-6 py-20 text-center">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)' }}>
+                  <Package size={22} strokeWidth={1.5} style={{ color: '#a09a90' }} />
+                </div>
+                <h3 className="text-[19px] font-bold mb-2" style={{ fontFamily: "'Playfair Display', serif", color: '#181511' }}>Olfactive void</h3>
+                <p className="text-[13px]" style={{ color: '#71675d' }}>No fragrances matching your refined search.</p>
+              </div>
+            ) : filtered.map((product, idx) => (
+              <motion.article
+                key={product.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.03 }}
+                className="p-4"
+              >
+                <div className="flex gap-4">
+                  <div className="w-20 h-24 rounded-2xl overflow-hidden shrink-0" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)' }}>
+                    {product.images?.[0] ? (
+                      <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center"><Package size={20} strokeWidth={1.5} style={{ color: '#d0c8c0' }} /></div>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <h3 className="text-[15px] font-bold leading-snug line-clamp-2" style={{ color: '#181511' }}>{product.name}</h3>
+                        <p className="mt-1 text-[9px] font-black tracking-[0.16em] uppercase" style={{ color: '#a09a90' }}>
+                          SKU: {product.id.split('-')[0]}
+                        </p>
+                      </div>
+                      <span className={`shrink-0 px-2.5 py-1 rounded-lg text-[8.5px] font-black tracking-[0.12em] uppercase ${
+                        product.in_stock ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
+                      }`}>
+                        {product.in_stock ? 'Live' : 'Out'}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      <div className="rounded-xl p-3" style={{ background: '#faf9f7' }}>
+                        <p className="text-[8.5px] font-black uppercase tracking-[0.16em]" style={{ color: '#a09a90' }}>Price</p>
+                        <p className="mt-1 text-[13px] font-bold" style={{ color: '#181511' }}>{formatPrice(product.price)}</p>
+                      </div>
+                      <div className="rounded-xl p-3" style={{ background: '#faf9f7' }}>
+                        <p className="text-[8.5px] font-black uppercase tracking-[0.16em]" style={{ color: '#a09a90' }}>Stock</p>
+                        <p className="mt-1 text-[13px] font-bold" style={{ color: '#181511' }}>{product.stock_qty} btls</p>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between gap-3">
+                      <span className="min-w-0 truncate text-[9px] font-black tracking-[0.16em] px-3 py-1.5 rounded-lg uppercase" style={{ background: 'rgba(24,21,17,0.04)', color: '#71675d' }}>
+                        {product.category?.name || 'Private Blend'}
+                      </span>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <Link
+                          to={`/admin/products/${product.id}/edit`}
+                          className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90"
+                          style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#71675d' }}
+                          title="Edit"
+                        >
+                          <Edit size={14} />
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(product.id)}
+                          disabled={deletingId === product.id}
+                          className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90 disabled:opacity-50"
+                          style={{ background: '#fff5f5', border: '1px solid rgba(239,68,68,0.16)', color: '#ef4444' }}
+                          title="Delete"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[1000px]">
               <thead>
                 <tr style={{ background: '#faf9f7', borderBottom: '1px solid rgba(24,21,17,0.06)' }}>
-                  <th className="px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Masterpiece Details</th>
-                  <th className="px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Collection</th>
-                  <th className="px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Pricing</th>
-                  <th className="px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Stock Status</th>
-                  <th className="px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Visibility</th>
-                  <th className="px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase text-right" style={{ color: '#a09a90' }}>Management</th>
+                  <th className="px-5 sm:px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Masterpiece Details</th>
+                  <th className="px-5 sm:px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Collection</th>
+                  <th className="px-5 sm:px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Pricing</th>
+                  <th className="px-5 sm:px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Stock Status</th>
+                  <th className="px-5 sm:px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Visibility</th>
+                  <th className="px-5 sm:px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase text-right" style={{ color: '#a09a90' }}>Management</th>
                 </tr>
               </thead>
               <tbody className="divide-y" style={{ borderColor: 'rgba(24,21,17,0.04)' }}>
@@ -153,9 +236,9 @@ export default function AdminProducts() {
                     onMouseEnter={(e) => (e.currentTarget.style.background = '#faf9f7')}
                     onMouseLeave={(e) => (e.currentTarget.style.background = '#fff')}
                   >
-                    <td className="px-8 py-6">
+                    <td className="px-5 sm:px-8 py-6">
                       <div className="flex items-center gap-5">
-                        <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 transition-transform duration-500 group-hover:scale-105" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)' }}>
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 transition-transform duration-500 group-hover:scale-105" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)' }}>
                           {product.images?.[0] ? (
                             <img src={product.images[0]} alt="" className="w-full h-full object-cover" />
                           ) : (
@@ -163,7 +246,7 @@ export default function AdminProducts() {
                           )}
                         </div>
                         <div>
-                          <div className="text-[14px] font-bold mb-1 transition-colors duration-300" style={{ color: '#181511' }}>{product.name}</div>
+                          <div className="text-[13px] sm:text-[14px] font-bold mb-1 transition-colors duration-300" style={{ color: '#181511' }}>{product.name}</div>
                           <div className="text-[9px] font-black tracking-[0.2em] uppercase flex items-center gap-1.5" style={{ color: '#a09a90' }}>
                             <span className="w-1.5 h-1.5 rounded-full" style={{ background: 'rgba(201,164,114,0.3)' }} />
                             SKU: {product.id.split('-')[0]}
@@ -171,18 +254,18 @@ export default function AdminProducts() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-5 sm:px-8 py-6">
                       <span className="text-[9px] font-black tracking-[0.2em] px-3 py-1.5 rounded-lg uppercase" style={{ background: 'rgba(24,21,17,0.04)', color: '#71675d' }}>
                         {product.category?.name || 'Private Blend'}
                       </span>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-5 sm:px-8 py-6">
                       <div className="text-[14px] font-bold" style={{ color: '#181511' }}>{formatPrice(product.price)}</div>
                       {product.compare_at_price > 0 && (
                         <div className="text-[10px] line-through mt-0.5" style={{ color: '#a09a90' }}>{formatPrice(product.compare_at_price)}</div>
                       )}
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-5 sm:px-8 py-6">
                       <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full ${product.stock_qty < 5 ? 'bg-red-400 animate-pulse' : product.stock_qty < 15 ? 'bg-amber-400' : 'bg-emerald-400'}`} />
                         <span className="text-[13px] font-bold" style={{ color: '#181511' }}>
@@ -190,7 +273,7 @@ export default function AdminProducts() {
                         </span>
                       </div>
                     </td>
-                    <td className="px-8 py-6">
+                    <td className="px-5 sm:px-8 py-6">
                       <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-[9px] font-black tracking-[0.2em] uppercase ${
                         product.in_stock 
                           ? 'bg-emerald-50 text-emerald-600' 
@@ -199,11 +282,11 @@ export default function AdminProducts() {
                         {product.in_stock ? 'Available' : 'Out of Stock'}
                       </span>
                     </td>
-                    <td className="px-8 py-6 text-right">
+                    <td className="px-5 sm:px-8 py-6 text-right">
                       <div className="flex items-center justify-end gap-2 transition-opacity duration-300">
                         <Link
                           to={`/admin/products/${product.id}/edit`}
-                          className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 active:scale-90"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all duration-300 active:scale-90"
                           style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#71675d' }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.borderColor = 'rgba(201,164,114,0.4)';
@@ -222,7 +305,7 @@ export default function AdminProducts() {
                         <button
                           onClick={() => handleDelete(product.id)}
                           disabled={deletingId === product.id}
-                          className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 active:scale-90 disabled:opacity-50"
+                          className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all duration-300 active:scale-90 disabled:opacity-50"
                           style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#71675d' }}
                           onMouseEnter={(e) => {
                             e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)';
@@ -245,6 +328,7 @@ export default function AdminProducts() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
     </div>

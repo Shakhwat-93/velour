@@ -2,6 +2,7 @@
 
 export type UserRole = 'customer' | 'admin'
 export type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
+export type DeliveryArea = 'inside_dhaka' | 'outside_dhaka'
 
 export interface Profile {
   id: string
@@ -66,6 +67,9 @@ export interface ShippingAddress {
   city: string
   postalCode?: string
   postal_code?: string
+  delivery_area?: DeliveryArea
+  delivery_label?: string
+  delivery_fee?: number
 }
 
 export interface Order {
@@ -76,6 +80,7 @@ export interface Order {
   shipping_address: ShippingAddress
   subtotal: number
   total: number
+  courier_data?: unknown
   created_at: string
 }
 

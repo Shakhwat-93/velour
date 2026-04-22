@@ -344,6 +344,11 @@ export default function AdminLayout() {
   const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  useEffect(() => {
+    document.body.classList.toggle('menu-open', mobileOpen)
+    return () => document.body.classList.remove('menu-open')
+  }, [mobileOpen])
+
   const currentPage = (() => {
     const p = location.pathname
     if (p.includes('/products/new'))                          return 'Add Product'
@@ -356,7 +361,7 @@ export default function AdminLayout() {
   })()
 
   return (
-    <div className="min-h-screen flex font-sans" style={{ background: '#f5f0ea', color: '#181511' }}>
+    <div className="min-h-screen max-w-full overflow-x-hidden flex font-sans" style={{ background: '#f5f0ea', color: '#181511' }}>
 
       {/* ── Desktop Sidebar ── */}
       <aside
@@ -379,7 +384,7 @@ export default function AdminLayout() {
             <motion.aside
               initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-              className="fixed inset-y-0 left-0 w-[240px] z-50 flex flex-col lg:hidden"
+              className="fixed inset-y-0 left-0 w-[min(86vw,280px)] z-50 flex flex-col lg:hidden"
               style={{ boxShadow: '4px 0 40px rgba(0,0,0,0.4)' }}
             >
               <SidebarContent onClose={() => setMobileOpen(false)} session={session} />
@@ -389,11 +394,11 @@ export default function AdminLayout() {
       </AnimatePresence>
 
       {/* ── Main Content ── */}
-      <main className="flex-1 lg:ml-[240px] flex flex-col min-h-screen">
+      <main className="min-w-0 flex-1 lg:ml-[240px] flex flex-col min-h-screen overflow-x-hidden">
 
         {/* Header */}
         <header
-          className="h-[60px] sticky top-0 z-20 flex items-center justify-between px-6 lg:px-8"
+          className="h-[58px] sm:h-[60px] sticky top-0 z-20 flex items-center justify-between gap-3 px-4 sm:px-6 lg:px-8"
           style={{
             background: 'rgba(245,240,234,0.92)',
             backdropFilter: 'blur(16px)',
@@ -402,7 +407,7 @@ export default function AdminLayout() {
           }}
         >
           {/* Left */}
-          <div className="flex items-center gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <button
               onClick={() => setMobileOpen(true)}
               className="lg:hidden w-9 h-9 flex items-center justify-center rounded-xl border transition-all"
@@ -411,7 +416,7 @@ export default function AdminLayout() {
               <Menu size={18} strokeWidth={1.8} />
             </button>
 
-            <div className="flex items-center gap-2.5">
+            <div className="flex min-w-0 items-center gap-2.5">
               <span
                 className="hidden sm:block text-[9.5px] font-black tracking-[0.4em] uppercase px-2.5 py-1 rounded-lg"
                 style={{ color: '#c9a472', background: 'rgba(201,164,114,0.1)', border: '1px solid rgba(201,164,114,0.2)' }}
@@ -419,12 +424,12 @@ export default function AdminLayout() {
                 Velour
               </span>
               <span className="hidden sm:block" style={{ color: '#d0c8c0' }}>/</span>
-              <h1 className="text-[15px] font-bold text-[#181511] tracking-tight">{currentPage}</h1>
+              <h1 className="truncate text-[15px] font-bold text-[#181511] tracking-tight">{currentPage}</h1>
             </div>
           </div>
 
           {/* Right */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex shrink-0 items-center gap-2">
             <button
               className="relative w-9 h-9 flex items-center justify-center rounded-xl border transition-all"
               style={{ background: '#fff', borderColor: 'rgba(24,21,17,0.1)' }}
@@ -464,9 +469,10 @@ export default function AdminLayout() {
         </header>
 
         {/* Page content */}
-        <div className="flex-1 p-6 lg:p-10 max-w-[1600px] w-full mx-auto">
+        <div className="min-w-0 flex-1 w-full max-w-[1600px] mx-auto px-4 py-5 sm:px-6 sm:py-7 lg:p-10 overflow-x-hidden">
           <motion.div
             key={location.pathname}
+            className="min-w-0 max-w-full"
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
@@ -477,7 +483,7 @@ export default function AdminLayout() {
 
         {/* Footer */}
         <footer
-          className="px-6 lg:px-10 py-4 flex items-center justify-between"
+          className="px-4 py-4 sm:px-6 lg:px-10 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between"
           style={{ borderTop: '1px solid rgba(24,21,17,0.06)' }}
         >
           <span className="text-[9.5px] font-bold tracking-widest uppercase" style={{ color: 'rgba(24,21,17,0.2)' }}>

@@ -54,7 +54,7 @@ export default function AdminLogin() {
   const dateStr = time.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 
   return (
-    <div className="min-h-screen flex font-sans overflow-hidden" style={{ background: '#0b131b' }}>
+    <div className="min-h-screen flex font-sans overflow-x-hidden" style={{ background: '#0b131b' }}>
 
       {/* ══════════════════════════════════════════════════════════════
           LEFT — Brand Identity Panel
@@ -187,7 +187,7 @@ export default function AdminLogin() {
           style={{ background: 'linear-gradient(90deg, transparent, rgba(201,164,114,0.5), transparent)' }} />
 
         {/* Mobile logo bar */}
-        <div className="lg:hidden flex items-center justify-between px-8 py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.08)' }}>
+        <div className="lg:hidden flex items-center justify-between px-5 sm:px-8 py-5 sm:py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.08)' }}>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center border"
               style={{ background: 'rgba(201,164,114,0.1)', borderColor: 'rgba(201,164,114,0.25)' }}>
@@ -204,7 +204,7 @@ export default function AdminLogin() {
         </div>
 
         {/* Form area */}
-        <div className="flex-1 flex flex-col justify-center px-8 sm:px-14 py-12">
+        <div className="flex-1 flex flex-col justify-center px-5 sm:px-14 py-10 sm:py-12">
 
           {/* Header */}
           <motion.div
@@ -368,7 +368,7 @@ export default function AdminLogin() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="mt-10 pt-8 border-t flex items-center justify-between"
+            className="mt-10 pt-8 border-t flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between"
             style={{ borderColor: 'rgba(24,21,17,0.08)' }}
           >
             <div className="flex items-center gap-2">
@@ -389,7 +389,7 @@ export default function AdminLogin() {
         </div>
 
         {/* Bottom footer */}
-        <div className="px-8 sm:px-14 py-5 border-t flex items-center justify-between"
+        <div className="px-5 sm:px-14 py-5 border-t flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between"
           style={{ borderColor: 'rgba(24,21,17,0.06)' }}>
           <span className="text-[9px] font-bold tracking-widest uppercase" style={{ color: 'rgba(24,21,17,0.2)' }}>
             © 2026 Velour

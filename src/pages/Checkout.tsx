@@ -6,7 +6,20 @@ import { useCart } from '@/context/CartContext'
 import { useToast } from '@/context/ToastContext'
 import { formatPrice } from '@/lib/utils/formatPrice'
 import { supabase } from '@/lib/supabase/client'
-import type { OrderItem, ShippingAddress } from '@/lib/types'
+import type { DeliveryArea, OrderItem, ShippingAddress } from '@/lib/types'
+
+const DELIVERY_OPTIONS: Record<DeliveryArea, { label: string; detail: string; fee: number }> = {
+  inside_dhaka: {
+    label: 'Inside Dhaka',
+    detail: 'Dhaka city delivery charge',
+    fee: 80,
+  },
+  outside_dhaka: {
+    label: 'Outside Dhaka',
+    detail: 'Nationwide delivery charge',
+    fee: 130,
+  },
+}
 
 export default function Checkout() {
   const { state, subtotal, clearCart } = useCart()
@@ -22,9 +35,11 @@ export default function Checkout() {
     address: '',
     city: '',
     postalCode: '',
+    deliveryArea: 'inside_dhaka' as DeliveryArea,
   })
 
-  const deliveryFee = subtotal > 2500 ? 0 : 150
+  const selectedDelivery = DELIVERY_OPTIONS[form.deliveryArea]
+  const deliveryFee = selectedDelivery.fee
   const total = subtotal + deliveryFee
 
   if (state.items.length === 0 && !loading) {
@@ -48,6 +63,10 @@ export default function Checkout() {
 
   const handleInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     setForm((previous) => ({ ...previous, [event.target.name]: event.target.value }))
+  }
+
+  const handleDeliveryArea = (deliveryArea: DeliveryArea) => {
+    setForm((previous) => ({ ...previous, deliveryArea }))
   }
 
   const handleCheckout = async (event: React.FormEvent) => {
@@ -76,6 +95,9 @@ export default function Checkout() {
         city: form.city,
         postalCode: form.postalCode,
         postal_code: form.postalCode,
+        delivery_area: form.deliveryArea,
+        delivery_label: selectedDelivery.label,
+        delivery_fee: deliveryFee,
       }
 
       const { error } = await (supabase as any)
@@ -202,6 +224,47 @@ export default function Checkout() {
               </section>
 
               <section>
+                <h2 className="lux-label">Delivery area</h2>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {(Object.entries(DELIVERY_OPTIONS) as [DeliveryArea, typeof DELIVERY_OPTIONS[DeliveryArea]][]).map(([value, option]) => {
+                    const selected = form.deliveryArea === value
+
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => handleDeliveryArea(value)}
+                        className="group rounded-[1.35rem] border p-4 text-left transition-all duration-300 active:scale-[0.99]"
+                        style={{
+                          background: selected ? 'rgba(201,164,114,0.1)' : '#fff',
+                          borderColor: selected ? 'rgba(201,164,114,0.45)' : 'var(--color-border-light)',
+                          boxShadow: selected ? '0 14px 34px rgba(201,164,114,0.12)' : 'none',
+                        }}
+                        aria-pressed={selected}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-text-primary">{option.label}</p>
+                            <p className="mt-1 text-xs leading-5 text-text-muted">{option.detail}</p>
+                          </div>
+                          <span
+                            className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border"
+                            style={{
+                              borderColor: selected ? '#c9a472' : 'rgba(24,21,17,0.18)',
+                              background: selected ? '#c9a472' : '#fff',
+                            }}
+                          >
+                            {selected && <span className="h-2 w-2 rounded-full bg-white" />}
+                          </span>
+                        </div>
+                        <p className="mt-4 font-display text-2xl text-brand-gold-dark">{formatPrice(option.fee)}</p>
+                      </button>
+                    )
+                  })}
+                </div>
+              </section>
+
+              <section>
                 <h2 className="lux-label">Payment method</h2>
                 <div className="rounded-[1.5rem] border border-brand-gold/25 bg-brand-gold/8 px-5 py-5">
                   <div className="flex items-start justify-between gap-3">
@@ -275,11 +338,13 @@ export default function Checkout() {
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-2 text-text-muted">
                     <Truck size={14} className="text-brand-gold" />
-                    Shipping
+                    Delivery
                   </span>
-                  <span className="font-semibold text-text-primary">
-                    {deliveryFee === 0 ? 'Free' : formatPrice(deliveryFee)}
-                  </span>
+                  <span className="font-semibold text-text-primary">{formatPrice(deliveryFee)}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-text-muted">Area</span>
+                  <span className="font-semibold text-text-primary">{selectedDelivery.label}</span>
                 </div>
                 <div className="flex items-end justify-between border-t border-border-light pt-4">
                   <div>

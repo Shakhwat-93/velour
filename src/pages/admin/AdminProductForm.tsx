@@ -109,41 +109,41 @@ export default function AdminProductForm() {
   const inputStyle = { background: '#fff', border: '1px solid rgba(24,21,17,0.1)', color: '#181511', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }
 
   return (
-    <div className="max-w-6xl space-y-12 pb-32">
+    <div className="max-w-6xl space-y-8 sm:space-y-12 pb-24 sm:pb-32">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-        <div className="flex items-center gap-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 sm:gap-8">
+        <div className="flex items-center gap-4 sm:gap-6">
           <motion.button
             whileHover={{ x: -4 }}
             onClick={() => navigate('/admin/products')}
-            className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 active:scale-95 shadow-sm"
+            className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center transition-all duration-300 active:scale-95 shadow-sm shrink-0"
             style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
           >
             <ArrowLeft size={20} strokeWidth={2} />
           </motion.button>
           <div>
             <h4 className="text-[10px] font-black tracking-[0.4em] uppercase mb-2" style={{ color: '#c9a472' }}>Catalog</h4>
-            <h1 className="text-[36px] md:text-[44px] font-bold tracking-tight" style={{ fontFamily: "'Playfair Display', serif", color: '#181511', lineHeight: 1.1 }}>
+            <h1 className="text-[28px] sm:text-[36px] md:text-[44px] font-bold tracking-tight" style={{ fontFamily: "'Playfair Display', serif", color: '#181511', lineHeight: 1.1 }}>
               {isEditing ? 'Edit Product' : 'Add Product'}
             </h1>
           </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 items-start">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-6 lg:gap-8 items-start">
         
         {/* ── Left Column: Basic Details & Images ────────────────────────────────────────── */}
-        <div className="space-y-8">
+        <div className="min-w-0 space-y-6 sm:space-y-8">
           
           {/* Basic Details */}
           <div className="rounded-[24px] overflow-hidden" style={cardStyle}>
-            <div className="px-10 py-8 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+            <div className="px-5 py-5 sm:px-10 sm:py-8 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
               <div className="flex items-center gap-3">
                 <Info size={18} style={{ color: '#c9a472' }} />
                 <h2 className="text-[14px] font-bold tracking-widest uppercase" style={{ color: '#181511' }}>Basic Details</h2>
               </div>
             </div>
-            <div className="p-10 space-y-8">
+            <div className="p-5 sm:p-10 space-y-6 sm:space-y-8">
               <div className="space-y-3">
                 <label className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#71675d' }}>
                   Product Name
@@ -153,7 +153,7 @@ export default function AdminProductForm() {
                   value={form.name} 
                   placeholder="e.g. Velvet Rose" 
                   onChange={e => setForm({ ...form, name: e.target.value })} 
-                  className="w-full h-14 px-6 rounded-2xl text-[14px] font-medium outline-none transition-all duration-300"
+                  className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-2xl text-[14px] font-medium outline-none transition-all duration-300"
                   style={inputStyle}
                   onFocus={(e) => { e.target.style.borderColor = 'rgba(201,164,114,0.4)'; e.target.style.boxShadow = '0 4px 16px rgba(201,164,114,0.08)' }}
                   onBlur={(e) => { e.target.style.borderColor = 'rgba(24,21,17,0.1)'; e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)' }}
@@ -167,7 +167,7 @@ export default function AdminProductForm() {
                   value={form.description}
                   onChange={e => setForm({ ...form, description: e.target.value })}
                   placeholder="Enter product description..."
-                  className="w-full p-6 rounded-[20px] text-[14px] outline-none transition-all duration-300 min-h-[150px] resize-none leading-relaxed"
+                  className="w-full p-5 sm:p-6 rounded-[20px] text-[14px] outline-none transition-all duration-300 min-h-[132px] sm:min-h-[150px] resize-none leading-relaxed"
                   style={inputStyle}
                   onFocus={(e) => { e.target.style.borderColor = 'rgba(201,164,114,0.4)'; e.target.style.boxShadow = '0 4px 16px rgba(201,164,114,0.08)' }}
                   onBlur={(e) => { e.target.style.borderColor = 'rgba(24,21,17,0.1)'; e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)' }}
@@ -178,25 +178,25 @@ export default function AdminProductForm() {
 
           {/* Variants Section */}
           <div className="rounded-[24px] overflow-hidden" style={cardStyle}>
-            <div className="px-10 py-8 border-b flex justify-between items-center" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+            <div className="px-5 py-5 sm:px-10 sm:py-8 border-b flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
               <div className="flex items-center gap-3">
                 <Layers size={18} style={{ color: '#c9a472' }} />
-                <h2 className="text-[14px] font-bold tracking-widest uppercase" style={{ color: '#181511' }}>Product Variants (Sizes)</h2>
+                <h2 className="text-[12px] sm:text-[14px] font-bold tracking-widest uppercase" style={{ color: '#181511' }}>Product Variants (Sizes)</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setForm({ ...form, variants: [...form.variants, { size: '', price: 0, stock_qty: 0 }] })}
-                className="h-10 px-6 rounded-xl text-[10px] font-black tracking-widest uppercase flex items-center gap-2 transition-all active:scale-95"
+                className="h-10 w-full sm:w-auto px-6 rounded-xl text-[10px] font-black tracking-widest uppercase flex items-center justify-center gap-2 transition-all active:scale-95"
                 style={{ background: '#181511', color: '#fff' }}
               >
                 <Plus size={14} /> Add Variant
               </button>
             </div>
-            <div className="p-10 space-y-6">
+            <div className="p-5 sm:p-10 space-y-6">
               {form.variants.length > 0 ? (
                 <div className="space-y-4">
                   {form.variants.map((variant, index) => (
-                    <div key={index} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_48px] gap-4 items-end p-6 rounded-2xl border" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+                    <div key={index} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_48px] gap-4 items-end p-4 sm:p-6 rounded-2xl border" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
                       <div className="space-y-2">
                         <label className="text-[9px] font-black uppercase tracking-widest" style={{ color: '#a09a90' }}>Size (e.g. 15ml)</label>
                         <input
@@ -242,7 +242,7 @@ export default function AdminProductForm() {
                           const v = [...form.variants]; v.splice(index, 1)
                           setForm({ ...form, variants: v })
                         }}
-                        className="w-12 h-12 rounded-xl flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors"
+                        className="w-full md:w-12 h-12 rounded-xl flex items-center justify-center text-red-500 bg-red-50 md:bg-transparent hover:bg-red-50 transition-colors"
                       >
                         <X size={18} />
                       </button>
@@ -259,14 +259,14 @@ export default function AdminProductForm() {
 
           {/* Product Images */}
           <div className="rounded-[24px] overflow-hidden" style={cardStyle}>
-            <div className="px-10 py-8 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+            <div className="px-5 py-5 sm:px-10 sm:py-8 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
               <div className="flex items-center gap-3">
                 <ImageIcon size={18} style={{ color: '#c9a472' }} />
                 <h2 className="text-[14px] font-bold tracking-widest uppercase" style={{ color: '#181511' }}>Product Images</h2>
               </div>
             </div>
-            <div className="p-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div className="p-5 sm:p-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 mb-8 sm:mb-10">
                 {/* File Upload Area */}
                 <div className="relative group">
                   <input
@@ -316,7 +316,7 @@ export default function AdminProductForm() {
                   <button
                     type="button"
                     onClick={addImage}
-                    className="h-14 px-8 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase flex items-center justify-center gap-3 transition-all duration-300 active:scale-95 whitespace-nowrap"
+                    className="h-12 sm:h-14 px-8 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase flex items-center justify-center gap-3 transition-all duration-300 active:scale-95 whitespace-nowrap"
                     style={{ background: '#181511', color: '#fff' }}
                   >
                     <Plus size={14} strokeWidth={3} style={{ color: '#c9a472' }} /> 
@@ -327,7 +327,7 @@ export default function AdminProductForm() {
 
               <AnimatePresence mode="popLayout">
                 {form.images.length > 0 ? (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
                     {form.images.map((img, i) => (
                       <motion.div 
                         key={img + i} 
@@ -339,12 +339,12 @@ export default function AdminProductForm() {
                         style={{ border: '1px solid rgba(24,21,17,0.06)', background: '#faf9f7' }}
                       >
                         <img src={img} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                        <div className="absolute inset-0 bg-[#181511]/40 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center backdrop-blur-sm">
+                        <div className="absolute inset-0 sm:bg-[#181511]/40 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-300 flex items-start justify-end sm:items-center sm:justify-center p-2 sm:p-0 sm:backdrop-blur-sm">
                           <motion.button
                             whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
                             type="button"
                             onClick={() => removeImage(i)}
-                            className="w-12 h-12 rounded-xl bg-red-500 text-white flex items-center justify-center shadow-xl"
+                            className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-red-500 text-white flex items-center justify-center shadow-xl"
                           >
                             <X size={18} strokeWidth={2.5} />
                           </motion.button>
@@ -367,17 +367,17 @@ export default function AdminProductForm() {
         </div>
 
         {/* ── Right Column: Pricing & Options ─────────────────────────────── */}
-        <div className="space-y-8 lg:sticky lg:top-[120px]">
+        <div className="space-y-6 sm:space-y-8 lg:sticky lg:top-[120px]">
           
           {/* Pricing */}
           <div className="rounded-[24px] overflow-hidden" style={cardStyle}>
-            <div className="px-8 py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+            <div className="px-5 py-5 sm:px-8 sm:py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
               <div className="flex items-center gap-3">
                 <DollarSign size={16} style={{ color: '#c9a472' }} />
                 <h2 className="text-[12px] font-bold tracking-widest uppercase" style={{ color: '#181511' }}>Pricing</h2>
               </div>
             </div>
-            <div className="p-8 space-y-6">
+            <div className="p-5 sm:p-8 space-y-6">
               <div className="space-y-3">
                 <label className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#71675d' }}>Price (BDT)</label>
                 <div className="relative">
@@ -413,13 +413,13 @@ export default function AdminProductForm() {
 
           {/* Inventory */}
           <div className="rounded-[24px] overflow-hidden" style={cardStyle}>
-            <div className="px-8 py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+            <div className="px-5 py-5 sm:px-8 sm:py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
               <div className="flex items-center gap-3">
                 <Package size={16} style={{ color: '#c9a472' }} />
                 <h2 className="text-[12px] font-bold tracking-widest uppercase" style={{ color: '#181511' }}>Inventory</h2>
               </div>
             </div>
-            <div className="p-8 space-y-6">
+            <div className="p-5 sm:p-8 space-y-6">
               <div className="space-y-3">
                 <label className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#71675d' }}>Stock Quantity</label>
                 <input 
@@ -448,13 +448,13 @@ export default function AdminProductForm() {
 
           {/* Organization */}
           <div className="rounded-[24px] overflow-hidden" style={cardStyle}>
-            <div className="px-8 py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+            <div className="px-5 py-5 sm:px-8 sm:py-6 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
               <div className="flex items-center gap-3">
                 <Layers size={16} style={{ color: '#c9a472' }} />
                 <h2 className="text-[12px] font-bold tracking-widest uppercase" style={{ color: '#181511' }}>Organization</h2>
               </div>
             </div>
-            <div className="p-8 space-y-6">
+            <div className="p-5 sm:p-8 space-y-6">
               <div className="space-y-3">
                 <label className="text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#71675d' }}>Category</label>
                 <div className="relative">

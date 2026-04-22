@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { motion } from 'framer-motion'
-import { Megaphone, Link as LinkIcon, Save, Sparkles, Image as ImageIcon, Type, FileText, Gift, Eye } from 'lucide-react'
+import { Megaphone, Link as LinkIcon, Save, Sparkles, Image as ImageIcon, Type, FileText, Gift, Eye, Truck, KeyRound, ShieldCheck } from 'lucide-react'
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState<{ [key: string]: string }>({})
@@ -39,17 +39,117 @@ export default function AdminSettings() {
   )
 
   return (
-    <div className="max-w-3xl space-y-12 pb-32">
+    <div className="max-w-3xl space-y-8 sm:space-y-12 pb-24 sm:pb-32">
       {/* Header Section */}
       <div className="flex flex-col gap-4">
         <h4 className="text-[10px] font-black tracking-[0.4em] uppercase" style={{ color: '#c9a472' }}>Management</h4>
-        <h1 className="text-[36px] md:text-[44px] font-bold tracking-tight mb-2" style={{ fontFamily: "'Playfair Display', serif", color: '#181511', lineHeight: 1.1 }}>
+        <h1 className="text-[28px] sm:text-[36px] md:text-[44px] font-bold tracking-tight mb-2" style={{ fontFamily: "'Playfair Display', serif", color: '#181511', lineHeight: 1.1 }}>
           Settings
         </h1>
-        <p className="text-[14px] font-medium max-w-xl" style={{ color: '#71675d' }}>
+        <p className="text-[13px] sm:text-[14px] font-medium max-w-xl" style={{ color: '#71675d' }}>
           Configure global store options and announcement banners.
         </p>
       </div>
+
+      {/* Courier Integration */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="rounded-[24px] overflow-hidden"
+        style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }}
+      >
+        <div className="px-5 py-5 sm:px-10 sm:py-8 border-b flex items-center gap-4 sm:gap-5" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+            <Truck size={24} style={{ color: '#4f46e5' }} strokeWidth={1.7} />
+          </div>
+          <div>
+            <h2 className="text-[18px] sm:text-[20px] font-bold tracking-tight" style={{ color: '#181511' }}>Courier Integration (Steadfast)</h2>
+            <p className="text-[11px] sm:text-[12px] font-medium mt-1" style={{ color: '#71675d' }}>Create Steadfast courier entries from the admin order panel</p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSave} className="p-5 sm:p-10 space-y-7 sm:space-y-8">
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#181511' }}>
+                <KeyRound size={14} style={{ color: '#4f46e5' }} /> API Key
+              </label>
+              <input
+                type="password"
+                value={settings['steadfast_api_key'] || ''}
+                onChange={e => setSettings({ ...settings, steadfast_api_key: e.target.value })}
+                placeholder="Paste Steadfast API key"
+                className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
+                autoComplete="off"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <label className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#181511' }}>
+                <ShieldCheck size={14} style={{ color: '#4f46e5' }} /> Secret Key
+              </label>
+              <input
+                type="password"
+                value={settings['steadfast_secret_key'] || ''}
+                onChange={e => setSettings({ ...settings, steadfast_secret_key: e.target.value })}
+                placeholder="Paste Steadfast secret key"
+                className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
+                autoComplete="off"
+              />
+            </div>
+          </div>
+
+          <div className="rounded-[20px] border p-4 sm:p-5 space-y-5" style={{ background: '#faf9f7', borderColor: 'rgba(24,21,17,0.06)' }}>
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[14px] font-bold" style={{ color: '#181511' }}>Enable Integration</p>
+                <p className="mt-1 text-[12px] font-medium" style={{ color: '#71675d' }}>Allow admin panel to send orders to Steadfast.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSettings({ ...settings, steadfast_enabled: settings['steadfast_enabled'] === 'true' ? 'false' : 'true' })}
+                className={`relative h-8 w-14 shrink-0 rounded-full transition-colors duration-300 ${settings['steadfast_enabled'] === 'true' ? 'bg-[#4f46e5]' : 'bg-[#e5e0d8]'}`}
+                aria-pressed={settings['steadfast_enabled'] === 'true'}
+              >
+                <div className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow-sm transition-transform duration-300 ${settings['steadfast_enabled'] === 'true' ? 'translate-x-7' : 'translate-x-1'}`} />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-[14px] font-bold" style={{ color: '#181511' }}>Auto-Dispatch</p>
+                <p className="mt-1 text-[12px] font-medium" style={{ color: '#71675d' }}>Saved for workflow automation; manual dispatch remains available.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSettings({ ...settings, steadfast_auto_dispatch: settings['steadfast_auto_dispatch'] === 'true' ? 'false' : 'true' })}
+                className={`relative h-8 w-14 shrink-0 rounded-full transition-colors duration-300 ${settings['steadfast_auto_dispatch'] === 'true' ? 'bg-[#4f46e5]' : 'bg-[#e5e0d8]'}`}
+                aria-pressed={settings['steadfast_auto_dispatch'] === 'true'}
+              >
+                <div className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow-sm transition-transform duration-300 ${settings['steadfast_auto_dispatch'] === 'true' ? 'translate-x-7' : 'translate-x-1'}`} />
+              </button>
+            </div>
+          </div>
+
+          <div className="pt-4 sm:pt-8 flex">
+            <button
+              type="submit"
+              disabled={saving}
+              className="w-full px-10 h-12 sm:h-14 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all shadow-md flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"
+              style={{ background: '#4f46e5', color: '#fff' }}
+            >
+              {saving ? (
+                <div className="w-4 h-4 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.2)', borderTopColor: '#fff' }} />
+              ) : (
+                <Save size={16} strokeWidth={3} />
+              )}
+              {saving ? 'Saving...' : 'Save Courier Settings'}
+            </button>
+          </div>
+        </form>
+      </motion.div>
 
       {/* Settings Form Card */}
       <motion.div 
@@ -58,17 +158,17 @@ export default function AdminSettings() {
         className="rounded-[24px] overflow-hidden"
         style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }}
       >
-        <div className="px-10 py-8 border-b flex items-center gap-5" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
-          <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+        <div className="px-5 py-5 sm:px-10 sm:py-8 border-b flex items-center gap-4 sm:gap-5" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
             <Megaphone size={24} style={{ color: '#181511' }} strokeWidth={1.5} />
           </div>
           <div>
-            <h2 className="text-[20px] font-bold tracking-tight" style={{ color: '#181511' }}>Announcement Bar</h2>
-            <p className="text-[12px] font-medium mt-1" style={{ color: '#71675d' }}>Displayed at the top of the store</p>
+            <h2 className="text-[18px] sm:text-[20px] font-bold tracking-tight" style={{ color: '#181511' }}>Announcement Bar</h2>
+            <p className="text-[11px] sm:text-[12px] font-medium mt-1" style={{ color: '#71675d' }}>Displayed at the top of the store</p>
           </div>
         </div>
         
-        <form onSubmit={handleSave} className="p-10 space-y-8">
+        <form onSubmit={handleSave} className="p-5 sm:p-10 space-y-7 sm:space-y-8">
           <div className="space-y-6">
             <div className="space-y-3">
               <label className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#181511' }}>
@@ -78,8 +178,8 @@ export default function AdminSettings() {
                 type="text" 
                 value={settings['announcement_text'] || ''} 
                 onChange={e => setSettings({...settings, announcement_text: e.target.value})} 
-                placeholder="e.g. Free shipping on all orders over ৳5,000"
-                className="w-full h-14 px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                placeholder="e.g. Dhaka delivery ৳80, outside Dhaka ৳130"
+              className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
                 style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
                 onFocus={(e) => e.target.style.borderColor = 'rgba(201,164,114,0.4)'}
                 onBlur={(e) => e.target.style.borderColor = 'rgba(24,21,17,0.06)'}
@@ -95,7 +195,7 @@ export default function AdminSettings() {
                 value={settings['announcement_link'] || ''} 
                 onChange={e => setSettings({...settings, announcement_link: e.target.value})} 
                 placeholder="e.g. /shop"
-                className="w-full h-14 px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+              className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
                 style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
                 onFocus={(e) => e.target.style.borderColor = 'rgba(201,164,114,0.4)'}
                 onBlur={(e) => e.target.style.borderColor = 'rgba(24,21,17,0.06)'}
@@ -103,11 +203,11 @@ export default function AdminSettings() {
             </div>
           </div>
 
-          <div className="pt-8 flex">
+          <div className="pt-4 sm:pt-8 flex">
             <button 
               type="submit" 
               disabled={saving} 
-              className="px-10 h-14 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all shadow-md flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"
+              className="w-full sm:w-auto px-10 h-12 sm:h-14 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all shadow-md flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"
               style={{ background: '#181511', color: '#fff' }}
             >
               {saving ? (
@@ -127,21 +227,21 @@ export default function AdminSettings() {
         className="rounded-[24px] overflow-hidden"
         style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }}
       >
-        <div className="px-10 py-8 border-b flex items-center gap-5" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
-          <div className="w-14 h-14 rounded-xl flex items-center justify-center" style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
+        <div className="px-5 py-5 sm:px-10 sm:py-8 border-b flex items-center gap-4 sm:gap-5" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 4px 12px rgba(0,0,0,0.02)' }}>
             <Sparkles size={24} style={{ color: '#c9a472' }} strokeWidth={1.5} />
           </div>
           <div>
-            <h2 className="text-[20px] font-bold tracking-tight" style={{ color: '#181511' }}>Promo Popup Card</h2>
-            <p className="text-[12px] font-medium mt-1" style={{ color: '#71675d' }}>Configure the marketing popup shown to visitors</p>
+            <h2 className="text-[18px] sm:text-[20px] font-bold tracking-tight" style={{ color: '#181511' }}>Promo Popup Card</h2>
+            <p className="text-[11px] sm:text-[12px] font-medium mt-1" style={{ color: '#71675d' }}>Configure the marketing popup shown to visitors</p>
           </div>
         </div>
         
-        <form onSubmit={handleSave} className="p-10 space-y-8">
+        <form onSubmit={handleSave} className="p-5 sm:p-10 space-y-7 sm:space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Status */}
             <div className="space-y-4 md:col-span-2">
-              <div className="flex items-center justify-between p-4 rounded-xl border" style={{ background: '#faf9f7', borderColor: 'rgba(24,21,17,0.06)' }}>
+              <div className="flex items-center justify-between gap-4 p-4 rounded-xl border" style={{ background: '#faf9f7', borderColor: 'rgba(24,21,17,0.06)' }}>
                 <div className="flex items-center gap-3">
                   <Eye size={16} className="text-[#c9a472]" />
                   <span className="text-[11px] font-black tracking-widest uppercase">Enable Popup</span>
@@ -166,7 +266,7 @@ export default function AdminSettings() {
                 value={settings['promo_subtitle'] || ''} 
                 onChange={e => setSettings({...settings, promo_subtitle: e.target.value})} 
                 placeholder="e.g. Velour Private Collection"
-                className="w-full h-14 px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
                 style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
               />
             </div>
@@ -181,7 +281,7 @@ export default function AdminSettings() {
                 value={settings['promo_title'] || ''} 
                 onChange={e => setSettings({...settings, promo_title: e.target.value})} 
                 placeholder="e.g. Eid Special Discount"
-                className="w-full h-14 px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
                 style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
               />
             </div>
@@ -195,7 +295,7 @@ export default function AdminSettings() {
                 value={settings['promo_description'] || ''} 
                 onChange={e => setSettings({...settings, promo_description: e.target.value})} 
                 placeholder="Enter the popup message..."
-                className="w-full p-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300 min-h-[100px]"
+                className="w-full p-5 sm:p-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300 min-h-[100px]"
                 style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
               />
             </div>
@@ -210,7 +310,7 @@ export default function AdminSettings() {
                 value={settings['promo_code'] || ''} 
                 onChange={e => setSettings({...settings, promo_code: e.target.value})} 
                 placeholder="e.g. VELOUR20"
-                className="w-full h-14 px-6 rounded-xl text-[14px] font-bold outline-none transition-all duration-300"
+                className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-bold outline-none transition-all duration-300"
                 style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
               />
             </div>
@@ -225,7 +325,7 @@ export default function AdminSettings() {
                 value={settings['promo_button_text'] || ''} 
                 onChange={e => setSettings({...settings, promo_button_text: e.target.value})} 
                 placeholder="e.g. Claim My Discount"
-                className="w-full h-14 px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
                 style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
               />
             </div>
@@ -240,17 +340,17 @@ export default function AdminSettings() {
                 value={settings['promo_image'] || ''} 
                 onChange={e => setSettings({...settings, promo_image: e.target.value})} 
                 placeholder="e.g. /promo.png"
-                className="w-full h-14 px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
                 style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
               />
             </div>
           </div>
 
-          <div className="pt-8 flex">
+          <div className="pt-4 sm:pt-8 flex">
             <button 
               type="submit" 
               disabled={saving} 
-              className="px-10 h-14 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all shadow-md flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"
+              className="w-full sm:w-auto px-10 h-12 sm:h-14 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all shadow-md flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95"
               style={{ background: '#181511', color: '#fff' }}
             >
               {saving ? (
