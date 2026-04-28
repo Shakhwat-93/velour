@@ -8,6 +8,7 @@ export default function AdminSettings() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [savedMessage, setSavedMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const fetchSettings = async () => {
     const { data } = await (supabase as any).from('site_settings').select('*')
@@ -22,15 +23,27 @@ export default function AdminSettings() {
     fetchSettings()
   }, [])
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent, options?: { refreshPromo?: boolean }) => {
     e.preventDefault()
     setSaving(true)
     setSavedMessage('')
+    setErrorMessage('')
 
-    const payload = Object.entries(settings).map(([key, value]) => ({ key, value }))
-    await (supabase as any).from('site_settings').upsert(payload)
+    const nextSettings = {
+      ...settings,
+      ...(options?.refreshPromo ? { promo_revision: String(Date.now()) } : {}),
+    }
+    const payload = Object.entries(nextSettings).map(([key, value]) => ({ key, value }))
+    const { error } = await (supabase as any).from('site_settings').upsert(payload, { onConflict: 'key' })
 
     setSaving(false)
+
+    if (error) {
+      setErrorMessage(error.message || 'Settings could not be saved.')
+      return
+    }
+
+    setSettings(nextSettings)
     setSavedMessage('Settings saved successfully.')
     window.setTimeout(() => setSavedMessage(''), 3200)
   }
@@ -67,6 +80,18 @@ export default function AdminSettings() {
         </motion.div>
       )}
 
+      {errorMessage && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3 rounded-2xl border px-5 py-4"
+          style={{ background: '#fef2f2', borderColor: '#fecaca', color: '#991b1b' }}
+        >
+          <ShieldCheck size={18} strokeWidth={2.2} />
+          <p className="text-[13px] font-bold">{errorMessage}</p>
+        </motion.div>
+      )}
+
       {/* Courier Integration */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -84,7 +109,7 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        <form onSubmit={handleSave} className="p-5 sm:p-10 space-y-7 sm:space-y-8">
+        <form onSubmit={(event) => handleSave(event)} className="p-5 sm:p-10 space-y-7 sm:space-y-8">
           <div className="space-y-6">
             <div className="rounded-[20px] border p-4 sm:p-5 space-y-5" style={{ borderColor: 'rgba(79,70,229,0.14)', background: '#f8f7ff' }}>
               <div>
@@ -228,7 +253,7 @@ export default function AdminSettings() {
           </div>
         </div>
         
-        <form onSubmit={handleSave} className="p-5 sm:p-10 space-y-7 sm:space-y-8">
+        <form onSubmit={(event) => handleSave(event)} className="p-5 sm:p-10 space-y-7 sm:space-y-8">
           <div className="space-y-6">
             <div className="space-y-3">
               <label className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#181511' }}>
@@ -297,7 +322,7 @@ export default function AdminSettings() {
           </div>
         </div>
         
-        <form onSubmit={handleSave} className="p-5 sm:p-10 space-y-7 sm:space-y-8">
+        <form onSubmit={(event) => handleSave(event, { refreshPromo: true })} className="p-5 sm:p-10 space-y-7 sm:space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Status */}
             <div className="space-y-4 md:col-span-2">
@@ -385,6 +410,21 @@ export default function AdminSettings() {
                 value={settings['promo_button_text'] || ''} 
                 onChange={e => setSettings({...settings, promo_button_text: e.target.value})} 
                 placeholder="e.g. Claim My Discount"
+                className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
+                style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
+              />
+            </div>
+
+            {/* Button Link */}
+            <div className="space-y-3 md:col-span-2">
+              <label className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#181511' }}>
+                <LinkIcon size={14} style={{ color: '#c9a472' }} /> Button Link
+              </label>
+              <input 
+                type="text" 
+                value={settings['promo_button_link'] || ''} 
+                onChange={e => setSettings({...settings, promo_button_link: e.target.value})} 
+                placeholder="e.g. /shop or https://example.com"
                 className="w-full h-12 sm:h-14 px-5 sm:px-6 rounded-xl text-[14px] font-medium outline-none transition-all duration-300"
                 style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}
               />

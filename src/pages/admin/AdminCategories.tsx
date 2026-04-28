@@ -6,6 +6,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const INITIAL_FORM = { name: '', description: '', image_url: '' }
 
+const getFriendlyCategoryError = (error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error || '')
+
+  if (message.includes('categories_slug_key') || message.toLowerCase().includes('duplicate key')) {
+    return 'A category with this name already exists. Please use a different name.'
+  }
+
+  return message || 'Category could not be saved. Please try again.'
+}
+
 export default function AdminCategories() {
   const [categories, setCategories] = useState<any[]>([])
   const [loading, setLoading]       = useState(true)
@@ -29,24 +39,65 @@ export default function AdminCategories() {
 
   useEffect(() => { fetchCategories() }, [])
 
+  const getUniqueSlug = async (name: string, currentId?: string | null) => {
+    const baseSlug = slugify(name)
+
+    if (!baseSlug) {
+      throw new Error('Category name must include letters or numbers.')
+    }
+
+    const { data, error } = await (supabase as any)
+      .from('categories')
+      .select('id, slug')
+
+    if (error) throw error
+
+    const takenSlugs = new Set(
+      (data || [])
+        .filter((category: any) => category.id !== currentId)
+        .map((category: any) => category.slug)
+        .filter(Boolean),
+    )
+
+    if (!takenSlugs.has(baseSlug)) return baseSlug
+
+    let suffix = 2
+    while (takenSlugs.has(`${baseSlug}-${suffix}`)) {
+      suffix += 1
+    }
+
+    return `${baseSlug}-${suffix}`
+  }
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
-    const slug = slugify(form.name)
 
-    if (editingId) {
-      const { error } = await (supabase as any).from('categories').update({ ...form, slug }).eq('id', editingId)
-      if (error) alert(error.message)
-    } else {
-      const { error } = await (supabase as any).from('categories').insert({ ...form, slug })
-      if (error) alert(error.message)
+    try {
+      const slug = await getUniqueSlug(form.name, editingId)
+      const payload = {
+        ...form,
+        name: form.name.trim(),
+        description: form.description.trim() || null,
+        image_url: form.image_url.trim() || null,
+        slug,
+      }
+
+      const { error } = editingId
+        ? await (supabase as any).from('categories').update(payload).eq('id', editingId)
+        : await (supabase as any).from('categories').insert(payload)
+
+      if (error) throw error
+
+      setForm(INITIAL_FORM)
+      setShowForm(false)
+      setEditingId(null)
+      await fetchCategories()
+    } catch (error) {
+      alert(getFriendlyCategoryError(error))
+    } finally {
+      setSaving(false)
     }
-
-    setForm(INITIAL_FORM)
-    setShowForm(false)
-    setEditingId(null)
-    setSaving(false)
-    fetchCategories()
   }
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
