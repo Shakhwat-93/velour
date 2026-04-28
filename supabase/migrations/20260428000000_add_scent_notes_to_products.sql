@@ -1,0 +1,4 @@
+ALTER TABLE public.products
+  ADD COLUMN IF NOT EXISTS top_notes TEXT,
+  ADD COLUMN IF NOT EXISTS heart_notes TEXT,
+  ADD COLUMN IF NOT EXISTS base_notes TEXT;

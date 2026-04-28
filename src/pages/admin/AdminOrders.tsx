@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { formatPrice } from '@/lib/utils/formatPrice'
-import { Search, ChevronDown, Eye, X, Package, MapPin, ShoppingBag, Calendar, User, CreditCard, Box, Activity, RefreshCw, Truck, Send, CheckCircle, AlertCircle } from 'lucide-react'
+import { Search, ChevronDown, Eye, X, Package, MapPin, ShoppingBag, Calendar, User, CreditCard, Box, Activity, RefreshCw, Truck, Send, CheckCircle, AlertCircle, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const STATUS_OPTIONS = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
+
+type DeleteRequest = {
+  kind: 'single' | 'selected' | 'date' | 'month'
+  count: number
+  label: string
+  ids?: string[]
+  from?: string
+  to?: string
+}
 
 const statusStyle: Record<string, string> = {
   pending:   'bg-amber-50 text-amber-600 border-amber-200',
@@ -180,6 +189,11 @@ export default function AdminOrders() {
   const [updating, setUpdating] = useState<string | null>(null)
   const [settings, setSettings] = useState<Record<string, string>>({})
   const [submittingCourierId, setSubmittingCourierId] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [deleteDate, setDeleteDate] = useState('')
+  const [deleteMonth, setDeleteMonth] = useState('')
+  const [deleteRequest, setDeleteRequest] = useState<DeleteRequest | null>(null)
+  const [deletingOrders, setDeletingOrders] = useState(false)
   
   // Modal State
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null)
@@ -249,6 +263,10 @@ export default function AdminOrders() {
     fetchOrders()
     fetchSettings()
   }, [])
+
+  useEffect(() => {
+    setSelectedIds(prev => prev.filter(id => orders.some(order => order.id === id)))
+  }, [orders])
 
   const updateStatus = async (id: string, status: string) => {
     setUpdating(id)
@@ -345,6 +363,139 @@ export default function AdminOrders() {
     return matchSearch && matchFilter
   })
 
+  const selectedSet = new Set(selectedIds)
+  const allFilteredSelected = filtered.length > 0 && filtered.every(order => selectedSet.has(order.id))
+
+  const toggleSelected = (id: string) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id])
+  }
+
+  const toggleFilteredSelection = () => {
+    const filteredIds = filtered.map(order => order.id)
+    setSelectedIds(prev => {
+      if (filteredIds.length > 0 && filteredIds.every(id => prev.includes(id))) {
+        return prev.filter(id => !filteredIds.includes(id))
+      }
+
+      return Array.from(new Set([...prev, ...filteredIds]))
+    })
+  }
+
+  const getDateRange = (type: 'date' | 'month', value: string) => {
+    if (!value) return null
+
+    const start = new Date(type === 'date' ? `${value}T00:00:00` : `${value}-01T00:00:00`)
+    if (!Number.isFinite(start.getTime())) return null
+
+    const end = new Date(start)
+    if (type === 'date') end.setDate(end.getDate() + 1)
+    else end.setMonth(end.getMonth() + 1)
+
+    return {
+      from: start.toISOString(),
+      to: end.toISOString(),
+    }
+  }
+
+  const countOrdersInRange = (from: string, to: string) => {
+    const fromTime = new Date(from).getTime()
+    const toTime = new Date(to).getTime()
+
+    return orders.filter(order => {
+      const createdAt = new Date(order.created_at).getTime()
+      return createdAt >= fromTime && createdAt < toTime
+    }).length
+  }
+
+  const requestDeleteSingle = (order: any) => {
+    setDeleteRequest({
+      kind: 'single',
+      count: 1,
+      ids: [order.id],
+      label: `order #${order.id.split('-')[0].toUpperCase()}`,
+    })
+  }
+
+  const requestDeleteSelected = () => {
+    if (selectedIds.length === 0) return
+
+    setDeleteRequest({
+      kind: 'selected',
+      count: selectedIds.length,
+      ids: selectedIds,
+      label: `${selectedIds.length} selected order${selectedIds.length === 1 ? '' : 's'}`,
+    })
+  }
+
+  const requestDeleteDate = () => {
+    const range = getDateRange('date', deleteDate)
+    if (!range) return
+
+    setDeleteRequest({
+      kind: 'date',
+      count: countOrdersInRange(range.from, range.to),
+      label: `orders from ${new Date(range.from).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`,
+      from: range.from,
+      to: range.to,
+    })
+  }
+
+  const requestDeleteMonth = () => {
+    const range = getDateRange('month', deleteMonth)
+    if (!range) return
+
+    setDeleteRequest({
+      kind: 'month',
+      count: countOrdersInRange(range.from, range.to),
+      label: `orders from ${new Date(range.from).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}`,
+      from: range.from,
+      to: range.to,
+    })
+  }
+
+  const confirmDeleteOrders = async () => {
+    if (!deleteRequest || deleteRequest.count === 0) return
+    setDeletingOrders(true)
+
+    try {
+      let query = (supabase as any).from('orders').delete()
+
+      if (deleteRequest.ids?.length) {
+        query = query.in('id', deleteRequest.ids)
+      } else if (deleteRequest.from && deleteRequest.to) {
+        query = query.gte('created_at', deleteRequest.from).lt('created_at', deleteRequest.to)
+      } else {
+        throw new Error('Delete request is incomplete.')
+      }
+
+      const { error } = await query
+      if (error) throw error
+
+      const deletedIds = new Set(deleteRequest.ids || [])
+      setOrders(prev => prev.filter(order => {
+        if (deleteRequest.ids?.length) return !deletedIds.has(order.id)
+        const createdAt = new Date(order.created_at).getTime()
+        return !(createdAt >= new Date(deleteRequest.from!).getTime() && createdAt < new Date(deleteRequest.to!).getTime())
+      }))
+      setSelectedIds(prev => prev.filter(id => !deletedIds.has(id)))
+
+      if (selectedOrder) {
+        const selectedDeleted = deleteRequest.ids?.includes(selectedOrder.id)
+          || (deleteRequest.from && deleteRequest.to
+            && new Date(selectedOrder.created_at).getTime() >= new Date(deleteRequest.from).getTime()
+            && new Date(selectedOrder.created_at).getTime() < new Date(deleteRequest.to).getTime())
+
+        if (selectedDeleted) setSelectedOrder(null)
+      }
+
+      setDeleteRequest(null)
+    } catch (error: any) {
+      alert(error?.message || 'Failed to delete orders.')
+    } finally {
+      setDeletingOrders(false)
+    }
+  }
+
   return (
     <div className="min-w-0 max-w-full overflow-x-hidden space-y-8 sm:space-y-12 pb-24 sm:pb-32">
       {/* Header Section */}
@@ -410,6 +561,92 @@ export default function AdminOrders() {
         </div>
       </div>
 
+      {/* Delete Management */}
+      <div className="grid gap-4 xl:grid-cols-[1fr_1.25fr]">
+        <div className="rounded-[22px] border p-4 sm:p-5" style={{ background: '#fff', borderColor: 'rgba(24,21,17,0.06)', boxShadow: '0 4px 16px rgba(0,0,0,0.025)' }}>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.24em]" style={{ color: '#a09a90' }}>Bulk selection</p>
+              <p className="mt-1 text-[13px] font-semibold" style={{ color: '#181511' }}>
+                {selectedIds.length} selected from {filtered.length} visible orders
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={toggleFilteredSelection}
+                disabled={filtered.length === 0}
+                className="h-11 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.14em] transition-all disabled:opacity-50"
+                style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.08)', color: '#181511' }}
+              >
+                {allFilteredSelected ? 'Clear visible' : 'Select visible'}
+              </button>
+              <button
+                type="button"
+                onClick={requestDeleteSelected}
+                disabled={selectedIds.length === 0 || deletingOrders}
+                className="h-11 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.14em] transition-all disabled:opacity-45"
+                style={{ background: '#fee2e2', border: '1px solid #fecaca', color: '#991b1b' }}
+              >
+                Delete selected
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-[22px] border p-4 sm:p-5" style={{ background: '#fff', borderColor: 'rgba(24,21,17,0.06)', boxShadow: '0 4px 16px rgba(0,0,0,0.025)' }}>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-[10px] font-black uppercase tracking-[0.22em]" style={{ color: '#a09a90' }}>
+                Delete by date
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="date"
+                  value={deleteDate}
+                  onChange={(event) => setDeleteDate(event.target.value)}
+                  className="h-11 min-w-0 flex-1 rounded-xl border px-3 text-[13px] font-semibold outline-none"
+                  style={{ borderColor: 'rgba(24,21,17,0.08)', color: '#181511', background: '#faf9f7' }}
+                />
+                <button
+                  type="button"
+                  onClick={requestDeleteDate}
+                  disabled={!deleteDate || deletingOrders}
+                  className="h-11 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.12em] disabled:opacity-45"
+                  style={{ background: '#fee2e2', border: '1px solid #fecaca', color: '#991b1b' }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-[10px] font-black uppercase tracking-[0.22em]" style={{ color: '#a09a90' }}>
+                Delete by month
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="month"
+                  value={deleteMonth}
+                  onChange={(event) => setDeleteMonth(event.target.value)}
+                  className="h-11 min-w-0 flex-1 rounded-xl border px-3 text-[13px] font-semibold outline-none"
+                  style={{ borderColor: 'rgba(24,21,17,0.08)', color: '#181511', background: '#faf9f7' }}
+                />
+                <button
+                  type="button"
+                  onClick={requestDeleteMonth}
+                  disabled={!deleteMonth || deletingOrders}
+                  className="h-11 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.12em] disabled:opacity-45"
+                  style={{ background: '#fee2e2', border: '1px solid #fecaca', color: '#991b1b' }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Table Container */}
       <div className="min-w-0 max-w-full overflow-hidden rounded-[24px]" style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.06)', boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }}>
         {loading ? (
@@ -446,21 +683,40 @@ export default function AdminOrders() {
                   style={{ position: 'relative', zIndex: openDropdownId === order.id ? 50 : 1 }}
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0">
-                      <p className="text-[9px] font-black tracking-[0.2em] uppercase mb-1" style={{ color: '#a09a90' }}>Order</p>
-                      <h3 className="text-[15px] font-bold tracking-widest" style={{ color: '#181511' }}>#{order.id.split('-')[0].toUpperCase()}</h3>
-                      <p className="mt-1 text-[11px] font-medium" style={{ color: '#71675d' }}>
-                        {new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                      </p>
+                    <div className="flex min-w-0 items-start gap-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedSet.has(order.id)}
+                        onChange={() => toggleSelected(order.id)}
+                        className="mt-1 h-4 w-4 rounded border-gray-300 accent-[#181511]"
+                        aria-label={`Select order ${order.id}`}
+                      />
+                      <div className="min-w-0">
+                        <p className="text-[9px] font-black tracking-[0.2em] uppercase mb-1" style={{ color: '#a09a90' }}>Order</p>
+                        <h3 className="text-[15px] font-bold tracking-widest" style={{ color: '#181511' }}>#{order.id.split('-')[0].toUpperCase()}</h3>
+                        <p className="mt-1 text-[11px] font-medium" style={{ color: '#71675d' }}>
+                          {new Date(order.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </p>
+                      </div>
                     </div>
-                    <button
-                      onClick={() => setSelectedOrder(order)}
-                      className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90"
-                      style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#71675d' }}
-                      title="View Details"
-                    >
-                      <Eye size={16} strokeWidth={2} />
-                    </button>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <button
+                        onClick={() => setSelectedOrder(order)}
+                        className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90"
+                        style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#71675d' }}
+                        title="View Details"
+                      >
+                        <Eye size={16} strokeWidth={2} />
+                      </button>
+                      <button
+                        onClick={() => requestDeleteSingle(order)}
+                        className="w-10 h-10 rounded-xl flex items-center justify-center transition-all active:scale-90"
+                        style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' }}
+                        title="Delete order"
+                      >
+                        <Trash2 size={15} strokeWidth={2} />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="min-w-0 max-w-full mt-4 rounded-2xl p-4" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.05)' }}>
@@ -510,9 +766,19 @@ export default function AdminOrders() {
           </div>
 
           <div className="hidden lg:block overflow-visible">
-            <table className="w-full text-left border-collapse min-w-[1160px]">
+            <table className="w-full text-left border-collapse min-w-[1240px]">
               <thead>
                 <tr style={{ background: '#faf9f7', borderBottom: '1px solid rgba(24,21,17,0.06)' }}>
+                  <th className="px-6 py-6">
+                    <input
+                      type="checkbox"
+                      checked={allFilteredSelected}
+                      onChange={toggleFilteredSelection}
+                      disabled={filtered.length === 0}
+                      className="h-4 w-4 rounded border-gray-300 accent-[#181511] disabled:opacity-40"
+                      aria-label="Select all visible orders"
+                    />
+                  </th>
                   <th className="px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Order ID</th>
                   <th className="px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Customer</th>
                   <th className="px-8 py-6 text-[9px] font-black tracking-[0.3em] uppercase" style={{ color: '#a09a90' }}>Status</th>
@@ -524,7 +790,7 @@ export default function AdminOrders() {
               <tbody className="divide-y" style={{ borderColor: 'rgba(24,21,17,0.04)' }}>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-8 py-32 text-center">
+                    <td colSpan={7} className="px-8 py-32 text-center">
                       <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)' }}>
                         <ShoppingBag size={24} strokeWidth={1.5} style={{ color: '#a09a90' }} />
                       </div>
@@ -554,6 +820,15 @@ export default function AdminOrders() {
                       onMouseEnter={(e) => (e.currentTarget.style.background = '#faf9f7')}
                       onMouseLeave={(e) => (e.currentTarget.style.background = '#fff')}
                     >
+                      <td className="px-6 py-6">
+                        <input
+                          type="checkbox"
+                          checked={selectedSet.has(order.id)}
+                          onChange={() => toggleSelected(order.id)}
+                          className="h-4 w-4 rounded border-gray-300 accent-[#181511]"
+                          aria-label={`Select order ${order.id}`}
+                        />
+                      </td>
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-5">
                           <div className="h-12 px-4 rounded-xl flex items-center justify-center font-bold text-[11px] tracking-widest shadow-sm transition-all duration-300 group-hover:scale-105" style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#181511' }}>
@@ -616,24 +891,34 @@ export default function AdminOrders() {
                         )}
                       </td>
                       <td className="px-8 py-6 text-right">
-                        <button
-                          onClick={() => setSelectedOrder(order)}
-                          className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 active:scale-90 ml-auto"
-                          style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#71675d' }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.borderColor = 'rgba(201,164,114,0.4)';
-                            e.currentTarget.style.color = '#c9a472';
-                            e.currentTarget.style.background = '#fff';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.borderColor = 'rgba(24,21,17,0.06)';
-                            e.currentTarget.style.color = '#71675d';
-                            e.currentTarget.style.background = '#faf9f7';
-                          }}
-                          title="View Details"
-                        >
-                          <Eye size={16} strokeWidth={2} />
-                        </button>
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => setSelectedOrder(order)}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 active:scale-90"
+                            style={{ background: '#faf9f7', border: '1px solid rgba(24,21,17,0.06)', color: '#71675d' }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = 'rgba(201,164,114,0.4)';
+                              e.currentTarget.style.color = '#c9a472';
+                              e.currentTarget.style.background = '#fff';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = 'rgba(24,21,17,0.06)';
+                              e.currentTarget.style.color = '#71675d';
+                              e.currentTarget.style.background = '#faf9f7';
+                            }}
+                            title="View Details"
+                          >
+                            <Eye size={16} strokeWidth={2} />
+                          </button>
+                          <button
+                            onClick={() => requestDeleteSingle(order)}
+                            className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 active:scale-90"
+                            style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626' }}
+                            title="Delete order"
+                          >
+                            <Trash2 size={15} strokeWidth={2} />
+                          </button>
+                        </div>
                       </td>
                     </motion.tr>
                   )
@@ -978,13 +1263,85 @@ export default function AdminOrders() {
               </div>
 
               {/* Modal Footer */}
-              <div className="p-5 sm:p-8 border-t flex justify-end" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+              <div className="p-5 sm:p-8 border-t flex flex-col gap-3 sm:flex-row sm:justify-end" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+                <button 
+                  onClick={() => requestDeleteSingle(selectedOrder)}
+                  className="w-full sm:w-auto px-8 h-12 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all active:scale-95"
+                  style={{ background: '#fee2e2', border: '1px solid #fecaca', color: '#991b1b' }}
+                >
+                  Delete Order
+                </button>
                 <button 
                   onClick={() => setSelectedOrder(null)}
                   className="w-full sm:w-auto px-8 h-12 rounded-xl text-[11px] font-black tracking-[0.2em] uppercase transition-all shadow-md active:scale-95 hover:shadow-lg"
                   style={{ background: '#181511', color: '#fff' }}
                 >
                   Close
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {deleteRequest && (
+          <div className="fixed inset-0 z-[130] flex items-end justify-center p-0 sm:items-center sm:p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !deletingOrders && setDeleteRequest(null)}
+              className="absolute inset-0 bg-[#181511]/55 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 24 }}
+              transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+              className="relative w-full max-w-md overflow-hidden rounded-t-[24px] bg-white shadow-[0_24px_70px_rgba(0,0,0,0.24)] sm:rounded-[24px]"
+            >
+              <div className="p-6 sm:p-7">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: '#fee2e2', color: '#dc2626' }}>
+                  <Trash2 size={22} strokeWidth={2} />
+                </div>
+                <p className="text-[10px] font-black uppercase tracking-[0.28em]" style={{ color: '#dc2626' }}>
+                  Permanent delete
+                </p>
+                <h3 className="mt-3 text-[24px] font-bold leading-tight" style={{ fontFamily: "'Playfair Display', serif", color: '#181511' }}>
+                  Delete {deleteRequest.label}?
+                </h3>
+                <p className="mt-3 text-[13px] leading-6" style={{ color: '#71675d' }}>
+                  This will permanently remove <span className="font-bold" style={{ color: '#181511' }}>{deleteRequest.count}</span> order{deleteRequest.count === 1 ? '' : 's'} from the database. This action cannot be undone.
+                </p>
+
+                {deleteRequest.count === 0 && (
+                  <div className="mt-5 rounded-2xl border px-4 py-3" style={{ background: '#fff7ed', borderColor: '#fed7aa', color: '#9a3412' }}>
+                    <p className="text-[12px] font-semibold leading-5">
+                      No loaded orders match this date range, so there is nothing to delete.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-3 border-t p-5 sm:flex-row sm:justify-end" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+                <button
+                  type="button"
+                  onClick={() => setDeleteRequest(null)}
+                  disabled={deletingOrders}
+                  className="h-12 rounded-xl px-6 text-[10px] font-black uppercase tracking-[0.16em] disabled:opacity-50"
+                  style={{ background: '#fff', border: '1px solid rgba(24,21,17,0.08)', color: '#181511' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmDeleteOrders}
+                  disabled={deletingOrders || deleteRequest.count === 0}
+                  className="h-12 rounded-xl px-6 text-[10px] font-black uppercase tracking-[0.16em] disabled:opacity-45"
+                  style={{ background: '#dc2626', color: '#fff' }}
+                >
+                  {deletingOrders ? 'Deleting...' : 'Delete permanently'}
                 </button>
               </div>
             </motion.div>

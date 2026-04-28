@@ -158,6 +158,11 @@ export default function ProductDetail() {
   const images = product.images?.length ? product.images : []
   const hasDiscount = !!product.compare_at_price && product.compare_at_price > product.price
   const discountPct = hasDiscount ? Math.round(((product.compare_at_price! - product.price) / product.compare_at_price!) * 100) : 0
+  const scentNotes = {
+    top: product.top_notes?.trim() || DEFAULT_NOTES.top,
+    heart: product.heart_notes?.trim() || DEFAULT_NOTES.heart,
+    base: product.base_notes?.trim() || DEFAULT_NOTES.base,
+  }
 
   return (
     <div className="page-enter" style={{ background: '#faf7f2' }}>
@@ -318,9 +323,9 @@ export default function ProductDetail() {
 
             {/* Scent Profile */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-              <NoteItem icon={Droplets} label="Top Notes" value={DEFAULT_NOTES.top} />
-              <NoteItem icon={Wind} label="Heart Notes" value={DEFAULT_NOTES.heart} />
-              <NoteItem icon={Mountain} label="Base Notes" value={DEFAULT_NOTES.base} />
+              <NoteItem icon={Droplets} label="Top Notes" value={scentNotes.top} />
+              <NoteItem icon={Wind} label="Heart Notes" value={scentNotes.heart} />
+              <NoteItem icon={Mountain} label="Base Notes" value={scentNotes.base} />
             </div>
 
             {/* Actions */}

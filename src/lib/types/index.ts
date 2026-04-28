@@ -32,6 +32,9 @@ export interface Product {
   name: string
   slug: string
   description: string | null
+  top_notes: string | null
+  heart_notes: string | null
+  base_notes: string | null
   price: number
   compare_at_price: number | null
   category_id: string | null

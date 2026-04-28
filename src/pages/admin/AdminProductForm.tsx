@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase/client'
 import { slugify } from '@/lib/utils/slugify'
-import { ArrowLeft, Plus, X, ImageIcon, Check, Info, DollarSign, Package, Layers, ChevronDown, Upload, Loader2 } from 'lucide-react'
+import { ArrowLeft, Plus, X, ImageIcon, Check, Info, DollarSign, Package, Layers, ChevronDown, Upload, Loader2, Droplets, Wind, Mountain } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const INITIAL_FORM = {
   name: '', description: '', price: 0, compare_at_price: 0,
+  top_notes: '', heart_notes: '', base_notes: '',
   category_id: '', stock_qty: 0, featured: false, in_stock: true, images: [] as string[],
   variants: [] as any[],
 }
@@ -30,7 +31,15 @@ export default function AdminProductForm() {
       
       if (isEditing) {
         const { data } = await (supabase as any).from('products').select('*').eq('id', id).single()
-        if (data) setForm({ ...(data as any), compare_at_price: (data as any).compare_at_price || 0, images: (data as any).images || [], variants: (data as any).variants || [] })
+        if (data) setForm({ 
+          ...(data as any), 
+          compare_at_price: (data as any).compare_at_price || 0, 
+          top_notes: (data as any).top_notes || '',
+          heart_notes: (data as any).heart_notes || '',
+          base_notes: (data as any).base_notes || '',
+          images: (data as any).images || [], 
+          variants: (data as any).variants || [] 
+        })
       }
       setFetching(false)
     }
@@ -44,6 +53,9 @@ export default function AdminProductForm() {
       ...form, 
       slug: slugify(form.name), 
       compare_at_price: form.compare_at_price || null, 
+      top_notes: form.top_notes.trim() || null,
+      heart_notes: form.heart_notes.trim() || null,
+      base_notes: form.base_notes.trim() || null,
       category_id: form.category_id || null 
     }
     
@@ -173,6 +185,59 @@ export default function AdminProductForm() {
                   onBlur={(e) => { e.target.style.borderColor = 'rgba(24,21,17,0.1)'; e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)' }}
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Scent Profile */}
+          <div className="rounded-[24px] overflow-hidden" style={cardStyle}>
+            <div className="px-5 py-5 sm:px-10 sm:py-8 border-b" style={{ borderColor: 'rgba(24,21,17,0.06)', background: '#faf9f7' }}>
+              <div className="flex items-center gap-3">
+                <Droplets size={18} style={{ color: '#c9a472' }} />
+                <h2 className="text-[14px] font-bold tracking-widest uppercase" style={{ color: '#181511' }}>Scent Profile</h2>
+              </div>
+              <p className="mt-2 text-[12px] font-medium leading-relaxed" style={{ color: '#71675d' }}>
+                These notes appear on the product detail page beside the add-to-bag controls.
+              </p>
+            </div>
+            <div className="grid gap-5 p-5 sm:p-10 lg:grid-cols-3">
+              {[
+                {
+                  key: 'top_notes',
+                  label: 'Top Notes',
+                  placeholder: 'Bergamot, Pink Pepper, Saffron',
+                  icon: Droplets,
+                },
+                {
+                  key: 'heart_notes',
+                  label: 'Heart Notes',
+                  placeholder: 'Bulgarian Rose, Jasmine, Nutmeg',
+                  icon: Wind,
+                },
+                {
+                  key: 'base_notes',
+                  label: 'Base Notes',
+                  placeholder: 'Oud, Vanilla, Sandalwood, Amber',
+                  icon: Mountain,
+                },
+              ].map(({ key, label, placeholder, icon: Icon }) => (
+                <div key={key} className="space-y-3">
+                  <label className="flex items-center gap-2 text-[10px] font-black tracking-[0.2em] uppercase" style={{ color: '#71675d' }}>
+                    <span className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: 'rgba(201,164,114,0.1)', color: '#c9a472' }}>
+                      <Icon size={13} strokeWidth={1.8} />
+                    </span>
+                    {label}
+                  </label>
+                  <textarea
+                    value={form[key as 'top_notes' | 'heart_notes' | 'base_notes']}
+                    onChange={e => setForm({ ...form, [key]: e.target.value })}
+                    placeholder={placeholder}
+                    className="w-full min-h-[110px] resize-none rounded-[18px] p-4 text-[13px] font-semibold leading-relaxed outline-none transition-all duration-300"
+                    style={inputStyle}
+                    onFocus={(e) => { e.target.style.borderColor = 'rgba(201,164,114,0.4)'; e.target.style.boxShadow = '0 4px 16px rgba(201,164,114,0.08)' }}
+                    onBlur={(e) => { e.target.style.borderColor = 'rgba(24,21,17,0.1)'; e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.02)' }}
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
